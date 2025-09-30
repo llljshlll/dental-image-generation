@@ -24,13 +24,16 @@ conda activate dental-ai
 
 # Install requirements
 pip install -r requirements.txt
-
+```
 ---
 
 ## 🚀 Usage
+```bash
 # Run inference
 python inference.py \
   --input ./examples/input.png \
   --output ./results/output.png \
   --config ./configs/streamdiffusion_dental.yaml \
   --ckpt ./ckpts/dental_lora.ckpt
+```
+
