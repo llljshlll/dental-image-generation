@@ -97,16 +97,14 @@
 ---
 
 ### (3) ctrLoRA의 LoRA 학습
-- ControlNet 전체를 학습하지 않고, **LoRA 모듈만 학습**  
+- ControlNet 전체를 학습하지 않고, base controlNet은 freeze한 뒤, **LoRA 모듈만 학습**  
 - **LoRA 구조**:  
-  $$$
-  W = W_0 + \alpha \cdot B \cdot A
-  $$$ 
-  - \(W_0\): 기존 weight (freeze)  
-  - \(A, B\): 저랭크 행렬 (trainable)  
-  - \(\alpha\): scaling factor  
+  <img src="images/lora.png" alt="lora" width=600>
+  - W_0: 기존 weight (freeze)  
+  - A, B: 저랭크 행렬 (trainable)  
+  - a: scaling factor  
 - 학습 대상: LoRA 레이어 + ZeroConv + Normalization 레이어  
-- 장점: 파라미터 효율적, 다양한 condition 별 LoRA를 교체/조합 가능  
+<img src="images/lora training pipeline.png" alt="lora" width=600>
 
 ---
 
