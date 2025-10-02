@@ -4,8 +4,7 @@
 
 ## 1. 데이터 준비
 - **데이터 구성**: lighting map과 segmentation map을 **blending**하여 condition 이미지를 만듦  
-  <img src="images/dataset.png" alt="dataset" width=600>  
-- **샘플 수**: 2,000개  
+  <img src="images/dataset.png" alt="dataset" width=600>   
 - **데이터 형태**:  
   - **Source (condition)**: lighting map + segmentation map blending 이미지  
   - **Target (ground truth)**: 실제 치아와 유사한 렌더링 이미지  
@@ -16,7 +15,8 @@
       with professional lighting, high quality, detailed, dental photography, 
       clinical lighting setup"
       ```  
-      → 괄호 속 단어를 파일명에 맞춰 교체  
+      → 괄호 속 단어를 파일명에 맞춰 교체
+- **샘플 수**: 2,000개 
 
 ---
 
