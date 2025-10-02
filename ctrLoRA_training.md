@@ -4,8 +4,8 @@
 
 ## 1. 데이터 준비
 - **데이터 구성**: lighting map과 segmentation map을 **blending**하여 condition 이미지를 만듦  
-  <img src="images/input_blending.png" alt="lighting map, segmentation map blending">  
-- **샘플 수**: 1,999개  
+  <img src="images/dataset.png" alt="dataset">  
+- **샘플 수**: 2,000개  
 - **데이터 형태**:  
   - **Source (condition)**: lighting map + segmentation map blending 이미지  
   - **Target (ground truth)**: 실제 치아와 유사한 렌더링 이미지  
@@ -21,11 +21,10 @@
 ---
 
 ## 2. Forward Process (노이즈 추가 과정)
-1. 원본 이미지 \(x_0\)을 VAE 인코더를 통해 **latent space**로 변환  
-2. 랜덤 타임스텝 \(t\)를 샘플링 (예: 327/1000)  
-3. 해당 \(t\)에 대응하는 노이즈 비율 \(\alpha_t\)를 이용해 노이즈를 추가  
-   \[x_t = \sqrt{\bar{\alpha}_t} \, x_0 + \sqrt{1-\bar{\alpha}_t}\,\epsilon, \quad \epsilon \sim \mathcal{N}(0, I)\]  
-4. 이렇게 생성된 \(x_t\)가 학습 입력으로 사용됨  
+1. 원본 이미지 x_0를 VAE 인코더를 통해 **latent space**로 변환  
+2. 랜덤 타임스텝 t를 샘플링 (ex. 327/1000)  
+3. 해당 t에 대응하는 노이즈 비율 a_t를 이용해 노이즈를 추가  
+4. 이렇게 생성된 x_t가 학습 입력으로 사용됨  
 
 <img src="images/forward_noise_add_process.png" alt="forward process">  
 
@@ -35,11 +34,11 @@
 
 ### (1) 기존 ControlNet 학습 방식
 - **Base 구조**: Stable Diffusion의 Base UNet + ControlNet Branch  
-- **Base UNet**: 텍스트 조건 \(c_{\text{text}}\)만으로 이미지 생성  
+- **Base UNet**: 텍스트 조건 c_text만으로 이미지 생성  
 - **ControlNet Branch**:  
-  - Condition 이미지(hint, edge/depth/seg 등)를 입력받음  
-  - VAE 인코더로 latent space로 변환  
-  - Conv 블록으로 인코딩 → Base UNet 각 블록 feature에 **residual connection**으로 주입  
+  - Condition image(hint, edge/depth/seg 등)를 입력받음  
+  - Conv 블록으로 인코딩
+  - Base UNet의 대응 블록 feature에 **residual connection**으로 주입  
   - ZeroConv로 초기화되어 처음엔 영향 없음 → 학습이 진행되면서 유의미한 residual 제공
 
 <img src="images/controlNet_training_process.png" alt="controlNet training process">  
