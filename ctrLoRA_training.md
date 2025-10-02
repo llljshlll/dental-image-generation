@@ -33,22 +33,66 @@
 ## 3. ctrLoRA 학습
 
 ### (1) 기존 ControlNet 학습 방식
-- **Base 구조**: Stable Diffusion의 Base UNet + ControlNet Branch  
-- **Base UNet**: 텍스트 조건 c_text만으로 이미지 생성  
-- **ControlNet Branch**:  
-  - Condition image(hint, edge/depth/seg 등)를 입력받음  
-  - Conv 블록으로 인코딩
-  - Base UNet의 대응 블록 feature에 **residual connection**으로 주입  
-  - ZeroConv로 초기화되어 처음엔 영향 없음 → 학습이 진행되면서 유의미한 residual 제공
+> 핵심: **Base UNet은 latent 공간의 noisy 입력(x_t)로부터 노이즈를 예측** 함
+> **ControlNet Branch는 condition 이미지(c_cond)를 conv로 인코딩해 multi-scale residual을 UNet에 주입**함 
+> Loss는 오직 **노이즈 예측 MSE**로 계산되고, gradient가 ControlNet까지 흘러 들어가 condition→residual 매핑을 학습함
+
+#### 0) 입력/기본 구성
+- **x_t**: 위에서 forward diffusion으로 타임스텝에 따라 노이즈를 추가한 latent code
+- **c_text**: 텍스트 조건 (예: CLIP text encoder → cross-attention으로 UNet에 주입)  
+- **c_cond**: condition 이미지(예: edge/depth/seg/normal/pose 등)  
+  - c_cond는 VAE Encoder를 거치지 않고, ControlNet 내부의 trainable Conv 블록으로 바로 처리
+- **t**: 타임스텝(정수) → sinusoidal/time embedding으로 UNet/ControlNet 블록에 전달
+
+#### 1) ControlNet Branch: condition 인코딩 → multi-scale residual 생성
+- 입력: `c_cond` (이미지 공간 그대로)
+- 처리: ControlNet의 **Conv/Downsample 블록**을 거치며 해상도를 단계적으로 축소
+- 각 스테이지에서 feature를 **ZeroConv(1×1 conv, weight=0 초기화)**로 투영해 **UNet의 대응 스테이지에 맞는 residual feature**를 생성
+- SD 1.5 기준 latent 해상도 64×64에서는:
+  - 64×64 → ~320ch
+  - 32×32 → ~640ch
+  - 16×16 → ~1280ch
+  - 8×8  → ~1280ch
+- ZeroConv 파라미터 크기 예:
+  ```
+  [C_out, C_in, 1, 1]  (대체로 C_out = C_in = 해당 스테이지 채널 수)
+  ```
+- ZeroConv는 처음엔 0이라 UNet에 영향 없음 → **학습을 통해 점차 유의미한 residual을 전달하도록 업데이트**
+
+#### 2) Base UNet: noisy latent 처리 + residual 주입 + 텍스트 조건
+- 입력: `x_t`
+- 내부 주입:
+- `t` 임베딩 (time embedding)
+- `c_text` 임베딩 (cross-attention)
+- **ControlNet residual**(각 스테이지):  
+  ```
+  F_unet^(l) <- F_unet^(l) + ZeroConv( F_control^(l) )
+  ```
+- UNet의 down → middle → up 경로를 통과하며 최종 **예측 노이즈**를 출력:
 
 <img src="images/controlNet_training_process.png" alt="controlNet training process" width=600>  
 
+#### 3) Loss (MSE)
+- 타깃은 forward에서 사용한 가우시안 노이즈 `ε`
+- 출력은 UNet의 예측 노이즈 `ε_hat`
+- 손실:
+<img src="images/MSE.png" alt="MSE loss" width=600>  
+
+
+#### 4) backpropagation/update
+- `L`을 기준으로 **gradient가 Base UNet과 ControlNet Branch 전체**로 전파
+- 구현 설정에 따라:
+- **표준 ControlNet 학습**: Base UNet을 **freeze**하고, **ControlNet Branch(+ZeroConv)**만 업데이트  
+- **공동 미세조정(옵션)**: Base UNet도 작은 lr로 함께 업데이트 가능
+- 결과적으로 ControlNet은 **c_cond → UNet에 유용한 residual**을 만드는 법을 학습
+
 ---
 
-### (2) ctrLoRA의 Base ControlNet  
-- ctrLoRA는 **Base ControlNet을 고정(frozen)**  
-- Base ControlNet은 **9가지 condition (Canny, Depth, Normal, Segmentation, Pose 등)**을 하나의 네트워크에서 switching 가능하도록 학습됨  
-- 즉, 조건별로 별도의 ControlNet을 두는 게 아니라, **하나의 base ControlNet을 공유**하면서 condition만 교체  
+### (2) ctrLoRA의 Base ControlNet 학습
+- ctrLoRA는 **Base ControlNet을 고정(frozen)** 후, LoRA만 추가학습함
+- Base ControlNet은 **9가지 condition (Canny, Depth, Normal, Segmentation, Pose 등**)을 하나의 네트워크에서 switching 가능하도록 학습됨. 즉, 조건별로 별도의 ControlNet을 두는 게 아니라, **하나의 base ControlNet을 공유**하면서 condition만 교체
+- Base ControlNet에 들어가는 condition은 VAE를 거쳐서 인코딩 한 후, controlNet과 같은 학습 과정을 거침
+<img src="images/base controlNet pipeline.png" alt="controlNet training process" width=600>
 
 ---
 
