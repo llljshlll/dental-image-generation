@@ -1,4 +1,4 @@
-# 📘 ctrLoRA 학습 파이프라인
+# ctrLoRA 학습 파이프라인
 
 ---
 
@@ -75,7 +75,7 @@
 #### 3) Loss (MSE)
 - 타깃은 forward에서 사용한 가우시안 노이즈 `ε`
 - 출력은 UNet의 예측 노이즈 `ε_hat`
-- 손실:
+- loss:
 <img src="images/MSE.png" alt="MSE loss" width=600>  
 
 
@@ -109,20 +109,28 @@
 ---
 
 ## 4. Loss 계산
-- **출력**: UNet 최종 출력 = 예측 노이즈 \(\hat{\epsilon}_\theta(x_t, t, c)\)  
-- **Loss**:  
-  \[
-  L = \|\epsilon - \hat{\epsilon}_\theta\|^2
-  \]  
-- **역전파 경로**:  
+- **출력**: UNet 최종 출력 = 예측 노이즈
+- loss :
+  <img src="images/MSE.png" alt="MSE loss" width=600> 
+- **backpropagation 경로**:  
   - MSE Loss가 Base UNet + ControlNet Branch 전체로 전파됨  
-  - 그러나 Base ControlNet은 고정되어 있고, **LoRA 파라미터만 업데이트**  
-- **Classifier-free guidance**: 일정 확률(drop_rate)로 텍스트 조건을 제거하여, guidance 강도를 학습  
+  - 그러나 ctrLoRA에서는 Base ControlNet은 고정되어 있고, **LoRA 파라미터만 업데이트**  
 
 ---
 
-## ✅ 정리
-- **ctrLoRA는 Base ControlNet을 freeze한 상태에서 LoRA 모듈만 학습**  
-- Base ControlNet은 다중 condition switching을 지원하며, LoRA는 condition-specific residual을 학습  
-- Loss는 기존 diffusion과 동일하게 **노이즈 예측 MSE**  
-- 결과적으로 파라미터 효율이 높고, 조건별 제어 성능을 유지하면서도 빠르게 학습 가능  
+## 5. ctrLoRA 학습 결과
+배치사이즈1, max_step 5000으로 학습 진행
+RTX 4090기준 약 2시간 30분 소요
+
+
+
+
+
+
+
+
+
+
+
+
+
