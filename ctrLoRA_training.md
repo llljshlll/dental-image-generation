@@ -24,9 +24,7 @@
 1. 원본 이미지 \(x_0\)을 VAE 인코더를 통해 **latent space**로 변환  
 2. 랜덤 타임스텝 \(t\)를 샘플링 (예: 327/1000)  
 3. 해당 \(t\)에 대응하는 노이즈 비율 \(\alpha_t\)를 이용해 노이즈를 추가  
-   \[
-   x_t = \sqrt{\bar{\alpha}_t} \, x_0 + \sqrt{1-\bar{\alpha}_t}\,\epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
-   \]  
+   \[x_t = \sqrt{\bar{\alpha}_t} \, x_0 + \sqrt{1-\bar{\alpha}_t}\,\epsilon, \quad \epsilon \sim \mathcal{N}(0, I)\]  
 4. 이렇게 생성된 \(x_t\)가 학습 입력으로 사용됨  
 
 <img src="images/forward_noise_add_process.png" alt="forward process">  
