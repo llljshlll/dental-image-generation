@@ -4,7 +4,7 @@
 
 ## 1. 데이터 준비
 - **데이터 구성**: lighting map과 segmentation map을 **blending**하여 condition 이미지를 만듦  
-  <img src="images/dataset.png" alt="dataset">  
+  <img src="images/dataset.png" alt="dataset" width=600>  
 - **샘플 수**: 2,000개  
 - **데이터 형태**:  
   - **Source (condition)**: lighting map + segmentation map blending 이미지  
@@ -41,7 +41,7 @@
   - Base UNet의 대응 블록 feature에 **residual connection**으로 주입  
   - ZeroConv로 초기화되어 처음엔 영향 없음 → 학습이 진행되면서 유의미한 residual 제공
 
-<img src="images/controlNet_training_process.png" alt="controlNet training process" width=500>  
+<img src="images/controlNet_training_process.png" alt="controlNet training process" width=600>  
 
 ---
 
