@@ -104,7 +104,7 @@
   - A, B: 저랭크 행렬 (trainable)  
   - a: scaling factor  
 - 학습 대상: LoRA 레이어 + ZeroConv + Normalization 레이어  
-<img src="images/lora training pipeline.png" alt="lora" width=200>
+<img src="images/lora_training_pipeline.png" alt="lora" width=200>
 
 ---
 
