@@ -56,9 +56,9 @@
 ### (3) ctrLoRA의 LoRA 학습
 - ControlNet 전체를 학습하지 않고, **LoRA 모듈만 학습**  
 - **LoRA 구조**:  
-  ```
+  $$$
   W = W_0 + \alpha \cdot B \cdot A
-  ``` 
+  $$$ 
   - \(W_0\): 기존 weight (freeze)  
   - \(A, B\): 저랭크 행렬 (trainable)  
   - \(\alpha\): scaling factor  
