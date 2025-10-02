@@ -40,7 +40,9 @@
   - Condition 이미지(hint, edge/depth/seg 등)를 입력받음  
   - VAE 인코더로 latent space로 변환  
   - Conv 블록으로 인코딩 → Base UNet 각 블록 feature에 **residual connection**으로 주입  
-  - ZeroConv로 초기화되어 처음엔 영향 없음 → 학습이 진행되면서 유의미한 residual 제공  
+  - ZeroConv로 초기화되어 처음엔 영향 없음 → 학습이 진행되면서 유의미한 residual 제공
+
+<img src="images/controlNet_training_process.png" alt="controlNet training process">  
 
 ---
 
