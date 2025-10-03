@@ -1,4 +1,4 @@
-# ctrLoRA 학습 파이프라인
+# ctrLoRA training pipeline
 
 ---
 
@@ -111,16 +111,48 @@
 ## 4. Loss 계산
 - **출력**: UNet 최종 출력 = 예측 노이즈
 - loss :
-  <img src="images/MSE.png" alt="MSE loss" width=600> 
+<img src="images/MSE.png" alt="MSE loss" width=600> 
 - **backpropagation 경로**:  
   - MSE Loss가 Base UNet + ControlNet Branch 전체로 전파됨  
   - 그러나 ctrLoRA에서는 Base ControlNet은 고정되어 있고, **LoRA 파라미터만 업데이트**  
 
 ---
 
-## 5. ctrLoRA 학습 결과
+
+# ctrLoRA training result
+
+
 배치사이즈1, max_step 5000으로 학습 진행
 RTX 4090기준 약 2시간 30분 소요
+사진 순서는 모두 (input / ouput / target)
+
+## 1. 단일 condition
+- Lighting map만 학습 → inference 시 전체 조명 특성은 잘 반영되었으나, 치아의 세부 구조는 부족
+- Segmentation map만 학습 → 구조적 디테일은 살아나지만, 조명과 질감 표현이 불안정
+
+
+
+## (2) 다중 condition
+- Lighting + Segmentation 두 condition을 **동시에 입력하여 inference**
+- 문제: multi-condition interference 발생
+  - 구조를 더 잘표현하는 Segmentation map과 디테일을 더 잘 복원하는 lighting map 정보가 서로 간섭
+  → 결과 이미지가 불안정하거나 artifact 발생  
+
+## (3) Blending 방식
+- Lighting map과 Segmentation map을 사전에 **blending하여 하나의 condition 이미지**로 통합
+- 이렇게 만든 blended condition을 input으로 학습 진행
+
+- multi-condition interference 완화
+- 구조적 디테일(치아)과 lighting 특성이 모두 안정적으로 반영됨
+- 하지만, 치아 부분의 디테일 손상 여전히 발생
+
+
+
+
+
+
+
+
 
 
 
