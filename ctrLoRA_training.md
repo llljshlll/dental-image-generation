@@ -8,7 +8,7 @@
 - **데이터 형태**:  
   - **Source (condition)**: lighting map + segmentation map blending 이미지  
   - **Target (ground truth)**: 실제 치아와 유사한 렌더링 이미지  
-  - **Prompt**: 치아 PNG 파일 이름을 기반으로 자동 생성  
+  - **Prompt**: 치아 PNG 파일 이름을 기반으로 자동 생성
     - 템플릿:  
       ```
       "a 3D dental model of (upper/lower) teeth, (top/front/bottom/left/right view), 
