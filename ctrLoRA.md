@@ -1,20 +1,19 @@
-# 🧠 CtrLoRA: 확장 가능하고 효율적인 제어형 이미지 생성 프레임워크
+# 🧠 CtrLoRA: AN EXTENSIBLE AND EFFICIENT FRAMEWORK FOR CONTROLLABLE IMAGE GENERATION
 
-> 📄 원문 논문: [ICLR 2025](https://github.com/xyfJASON/ctrlora)  
-> ✍️ 저자: Yifeng Xu, Zhenliang He, Shiguang Shan, Xilin Chen  
-> 🧩 소속: 중국과학원 컴퓨팅기술연구소, 중국과학원대학
+>  원문 논문: [ICLR 2025](https://github.com/xyfJASON/ctrlora)  
+>  저자: Yifeng Xu, Zhenliang He, Shiguang Shan, Xilin Chen
 
 ---
 
-## 📘 개요 (Overview)
+## Overview
 
 **CtrLoRA**는 기존 **ControlNet**의 구조적 한계를 극복하기 위해 제안된  
-**확장 가능(extensible)** 하고 **효율적인(efficient)** 제어형 이미지-투-이미지(Image-to-Image, I2I) 생성 프레임워크입니다.
+**확장 가능(extensible)** 하고 **효율적인(efficient)** 제어형 이미지-투-이미지(Image-to-Image, I2I) 생성 프레임워크
 
 ControlNet은 새로운 조건(condition)을 추가할 때마다  
 수백만 개의 데이터쌍과 수백 시간의 GPU 학습이 필요했지만,  
 CtrLoRA는 이를 **Base ControlNet + LoRA 구조**로 재설계하여  
-**단 1,000개의 데이터쌍과 단일 GPU 1시간 미만의 학습만으로도 새로운 조건을 학습**할 수 있게 했습니다:contentReference[oaicite:0]{index=0}.
+**단 1,000개의 데이터쌍과 단일 GPU 1시간 미만의 학습만으로도 새로운 조건을 학습**할 수 있도록 함
 
 ---
 
