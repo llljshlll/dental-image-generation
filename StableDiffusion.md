@@ -2,14 +2,14 @@
 
 ---
 
-## 1️⃣ 개요 (Overview)
+## 1. Overview
 
 **Stable Diffusion = Multimodal Generative AI**  
 ```
 Input
-├── Text Prompt (자연어)
-├── Image (참조 이미지, 마스크 등)
-└── Other Modalities (Depth, Segmentation, Pose 등)
+├── Text Prompt
+├── Image
+└── Other Modalities (sementic map, depth map, representations ...)
 
 Process
 ├── Text Encoding → CLIP Transformer
@@ -21,17 +21,23 @@ Output
 └── VAE Decoder → 고해상도 이미지 생성 (512×512 이상)
 ```
 
+- Latent Space 기반 Diffusion → 효율적 연산
+
+- 멀티모달 입력 지원 → 언어+시각 융합
+
+- 텍스트로부터 의미적·시각적 일관성 있는 이미지 생성
+
 ---
 
-## 2️⃣ 기본 원리 (Fundamental Principle)
+## 2. Fundamental Principle
 
-Stable Diffusion은 다음 세 단계를 거칩니다:
+pixel space 대신 **latent space** 에서 denoising 과정을 수행하는 효율적 확산 모델.
 
 | 단계 | 역할 | 핵심 기술 |
 |------|------|-----------|
-| 1️⃣ Embedding | 텍스트나 이미지를 벡터로 변환 | **CLIP Text Encoder / Image Encoder** |
-| 2️⃣ Image Generation | 텍스트 벡터를 이미지 벡터로 매핑 | **Neural Network (UNet)** |
-| 3️⃣ Refinement | 노이즈 제거 과정을 통해 이미지를 선명하게 | **Diffusion Model (Denoising)** |
+| 1. Embedding | 텍스트나 이미지를 벡터로 변환 | **CLIP Text Encoder / Image Encoder** |
+| 2. Image Generation | 텍스트 벡터를 이미지 벡터로 매핑 | **Neural Network (UNet)** |
+| 3. Refinement | 노이즈 제거 과정을 통해 이미지를 선명하게 | **Diffusion Model (Denoising)** |
 
 ---
 
