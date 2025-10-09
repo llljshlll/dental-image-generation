@@ -4,9 +4,22 @@
 
 ## 1️⃣ 개요 (Overview)
 
-**Stable Diffusion**은 텍스트를 기반으로 고품질의 이미지를 생성하는 **딥러닝 기반 확산 모델(Diffusion Model)**입니다.  
-텍스트뿐 아니라 이미지, 마스크 등 다양한 형태의 **조건(condition)**을 입력으로 활용할 수 있으며,  
-**오픈소스(CompVis, Stability AI)**로 공개되어 현재는 **Stable Diffusion 3.0**까지 발전했습니다.
+**Stable Diffusion = Multimodal Generative AI**  
+'''
+Input
+├── Text Prompt (자연어)
+├── Image (참조 이미지, 마스크 등)
+└── Other Modalities (Depth, Segmentation, Pose 등)
+
+Process
+├── Text Encoding → CLIP Transformer
+├── Image Encoding → VAE Encoder → Latent Space z
+├── Denoising & Refinement → UNet + Diffusion Process
+└── Cross-Attention → 텍스트 의미와 시각 정보 결합
+
+Output
+└── VAE Decoder → 고해상도 이미지 생성 (512×512 이상)
+'''
 
 ---
 
