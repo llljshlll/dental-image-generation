@@ -66,9 +66,9 @@ CtrLoRA는 세 가지 핵심 구성요소로 이루어짐
 3. **Condition Embedding Network (VAE)** – 조건 이미지를 효율적으로 latent 공간으로 임베딩
 
 
-기존 controlNet 모델과 동일한 구조의 Base ControlNet에 LoRA를 switching하며 condition 별 고유 특성을 학습 시키는 것
-또한, condition을 받아올 때, zero convolution으로 받아오지만, ctrLoRA는 condition을 VAE로 받아와서 임베딩함
-ctrLoRA VS controlNet
+기존 controlNet 모델과 동일한 구조의 Base ControlNet에 LoRA를 switching하며 condition 별 고유 특성을 학습 시키는 것  
+또한, condition을 받아올 때, zero convolution으로 받아오지만, ctrLoRA는 condition을 VAE로 받아와서 임베딩함  
+ctrLoRA VS controlNet  
 ![CtrLoRA 구조](images/ctrLoRA_controlNet.png)
 
 ---
