@@ -35,21 +35,21 @@ CtrLoRA의 핵심 목표는 단순히 “적은 자원으로 학습하는 모델
 
 ### 세부 목표
 
-1. **공통 지식 학습 (Base ControlNet)**
+1. **Base ControlNet**
    - 여러 조건(Canny, Depth, Skeleton 등)을 동시에 학습시켜  
      다양한 I2I 생성의 일반적 원리를 습득
    - 이후 새로운 조건 학습의 기반 모델로 활용
 
-2. **조건별 세부 특성 학습 (Condition-specific LoRA)**
+2. **Condition-specific LoRA**
    - Base ControlNet은 고정(frozen)하고,  
      각 조건에 맞는 LoRA만 학습 → 효율적으로 차별화된 특성 반영  
    - 파라미터 수를 약 **90% 절감 (361M → 37M per condition)**
 
-3. **빠른 적응 (Fast Adaptation)**
+3. **Fast Adaptation**
    - 새로운 조건도 Base ControlNet을 유지한 채 LoRA만 학습  
    - **1,000개 데이터쌍, RTX 4090 1시간 이내 학습**으로 충분
 
-4. **조합과 확장성 (Composability & Extensibility)**
+4. **Composability & Extensibility**
    - 여러 LoRA를 결합해 **다중 조건(Multi-condition) 생성** 가능  
    - Stable Diffusion 기반 커뮤니티 모델(Realistic Vision, Mistoon 등)에 **Plug-and-Play 통합** 가능
 
@@ -59,11 +59,17 @@ CtrLoRA의 핵심 목표는 단순히 “적은 자원으로 학습하는 모델
 
 ![CtrLoRA 구조](images/ctrlora_framework.png)
 
-CtrLoRA는 세 가지 핵심 구성요소로 이루어집니다:
+CtrLoRA는 세 가지 핵심 구성요소로 이루어짐
 
 1. **Base ControlNet** – 여러 조건의 공통적인 생성 능력 학습  
 2. **Condition-specific LoRA** – 조건별 고유 특성 학습  
 3. **Condition Embedding Network (VAE)** – 조건 이미지를 효율적으로 latent 공간으로 임베딩
+
+
+기존 controlNet 모델과 동일한 구조의 Base ControlNet에 LoRA를 switching하며 condition 별 고유 특성을 학습 시키는 것
+또한, condition을 받아올 때, zero convolution으로 받아오지만, ctrLoRA는 condition을 VAE로 받아와서 임베딩함
+ctrLoRA VS controlNet
+![CtrLoRA 구조](images/ctrLoRA_controlNet.png)
 
 ---
 
