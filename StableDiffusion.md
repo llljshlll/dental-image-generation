@@ -5,7 +5,7 @@
 ## 1️⃣ 개요 (Overview)
 
 **Stable Diffusion = Multimodal Generative AI**  
-'''
+```
 Input
 ├── Text Prompt (자연어)
 ├── Image (참조 이미지, 마스크 등)
@@ -19,7 +19,7 @@ Process
 
 Output
 └── VAE Decoder → 고해상도 이미지 생성 (512×512 이상)
-'''
+```
 
 ---
 
