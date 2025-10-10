@@ -368,6 +368,22 @@ Classifier-Free Guidance Scale은 **7.5** 전후로 설정한다.
 3. **UNet Denoising**: Stable Diffusion의 latent space에서 noise 제거  
 4. **Decoding**: 최종 latent → VAE Decoder → 고해상도 이미지 복원  
 
+
+
+#### 3.4.5 Model Size Comparison
+
+CtrLoRA는 Base ControlNet을 고정한 채 LoRA 모듈만 추가 학습하기 때문에,  
+전체 파라미터 규모와 저장 용량이 기존 ControlNet보다 **대폭 감소**한다.
+
+| Model | Description | Size (GB) | Parameters (M) | Relative Cost |
+|--------|--------------|-----------|----------------|----------------|
+| **ControlNet (Full Fine-tuning)** | 조건별 모델 전체 재학습 | 1.45 GB | 780 M | 100% |
+| **Base ControlNet (Shared Backbone)** | 공통 I2I 지식 학습용 베이스 | 1.54 GB | 830 M | - |
+| **CtrLoRA (LoRA Module)** | 조건별 저랭크 학습 모듈 | 0.15 GB | 78 M | **≈10%** |
+
+> 💡 새로운 condition 추가 시, 전체 모델을 재학습할 필요 없이  
+> LoRA(148MB)만 추가하면 되므로 **GPU 시간 및 저장소 비용을 90% 이상 절감**.
+
 ---
 
 > 💡 결과
