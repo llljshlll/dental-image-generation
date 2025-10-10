@@ -75,7 +75,7 @@ Output
 > 이미지를 임베딩할 때, 사전 학습된 VAE의 표현 공간을 그대로 활용하여  
 > 학습 효율을 극대화함.
 
----
+
 
 ### 2.2 Base ControlNet (Shared Backbone)
 
@@ -88,7 +88,6 @@ Output
 > 💡 Base ControlNet = General I2I Knowledge Learner  
 > LoRA = Condition Expert Module
 
----
 
 ### 2.3 Condition-specific LoRA (Low-Rank Adaptation)
 
@@ -102,7 +101,7 @@ Output
 > ControlNet 전체를 다시 학습하지 않고, LoRA를 추가하는 것만으로  
 > 새로운 condition을 빠르게 지원 가능.
 
----
+
 
 ### 2.4 Denoising & Image Generation (Diffusion Process)
 
@@ -160,7 +159,7 @@ Base ControlNet은 **여러 조건(Condition)**을 하나의 네트워크로 통
 > 💡 Base ControlNet은 SD의 UNet 구조를 그대로 공유하지만,  
 > 입력으로 condition feature를 받아 “control-aware feature map”을 형성함.
 
----
+
 
 #### 3.1.2 학습 방식
 - Base ControlNet은 **9가지 base condition** (Canny, Depth, Skeleton, Segmentation 등)을 동시에 학습.  
@@ -174,7 +173,7 @@ Base ControlNet은 **여러 조건(Condition)**을 하나의 네트워크로 통
 > 💡 여러 조건을 **하나의 손실 함수로 통합**해 학습하므로,  
 > 공통된 구조·조명·형태 등의 시각적 패턴을 일반화할 수 있다.
 
----
+
 
 #### 3.1.3 역할
 - **공통적 이미지 생성 능력 학습 (General I2I knowledge)**  
@@ -206,7 +205,7 @@ LoRA는 **Base ControlNet 위에 부착되는 경량 적응 모듈**로,
 | **Frozen Backbone** | Base ControlNet의 파라미터는 고정됨 |
 | **Lightweight Parameter** | 약 37M 파라미터 (ControlNet 대비 1/10 수준) |
 
----
+
 
 #### 3.2.2 학습 및 적용
 1. Base ControlNet을 고정하고, 새로운 condition 데이터로 LoRA를 학습.  
@@ -235,7 +234,6 @@ Base ControlNet + LoRA 입력
 ```
 
 
----
 
 #### 3.3.1 기존 ControlNet의 한계
 - ControlNet은 condition image를 feature로 변환하기 위해  
@@ -249,7 +247,7 @@ Base ControlNet + LoRA 입력
 > 💡 이 현상은 조건 임베딩 네트워크가  
 > 학습 초기에 “무의미한 latent 공간”을 만들어내기 때문임.
 
----
+
 
 #### 3.3.2 Pretrained VAE Encoder의 도입
 CtrLoRA는 이를 해결하기 위해 **Stable Diffusion의 VAE Encoder**를 condition embedding network로 채택하였다.  
@@ -272,7 +270,7 @@ z_c = \text{VAE}_{enc}(c)
 | Sudden Convergence | 존재 | 제거됨 |
 | 학습 안정성 | 낮음 | 매우 높음 |
 
----
+
 
 #### 3.3.3 효과 및 장점
 - **빠른 수렴**: 학습 초기부터 의미 있는 condition feature를 전달함.  
@@ -306,7 +304,6 @@ VAE Decoder → 최종 이미지
 
 ```
 
----
 
 #### 3.4.1 Multi-Conditional Feature Aggregation
 
@@ -327,7 +324,7 @@ C_{\theta, \Psi}(z, c) = C_{\theta}(z) + \sum_{i=1}^{N} w_i \cdot L_{\psi_i}(z, 
 > 💡 이 구조 덕분에, 여러 조건(예: segmentation + lighting + pose)을  
 > 별도 네트워크 병합 없이 단일 forward pass로 통합 가능하다.
 
----
+
 
 #### 3.4.2 Denoising Process
 
@@ -347,7 +344,7 @@ latent 공간에서 노이즈를 점진적으로 제거한다.
 Sampling은 일반적으로 **DDIM (50 steps)** 또는 **DPM-Solver**를 사용하며,  
 Classifier-Free Guidance Scale은 **7.5** 전후로 설정한다.
 
----
+
 
 #### 3.4.3 Conditional Strength & Guidance
 
@@ -363,7 +360,7 @@ Classifier-Free Guidance Scale은 **7.5** 전후로 설정한다.
 > 💡 “가중치 조절”은 ControlNet의 strength 개념과 유사하며,  
 > 여러 조건의 밸런스를 직접 제어할 수 있다.  
 
----
+
 
 #### 3.4.4 Inference Pipeline Summary
 1. **Condition Encoding**: 모든 condition image → VAE Encoder → latent embedding 생성  
