@@ -1,4 +1,4 @@
-# 🧠 Stable Diffusion 정리
+# Stable Diffusion 정리
 
 ---
 
