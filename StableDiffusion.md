@@ -109,21 +109,52 @@ VAE Decoder → 최종 이미지
 
 
 #### 3.1.1 Why CLIP?
-- **Multimodal alignment**: 텍스트–이미지 쌍 기반의 contrastive 학습으로 두 모달리티를 같은 semantic space에 정렬.
-- **Generalization**: 거대 웹 스케일 데이터로 학습되어 **스타일·콘셉트** 전반에 강한 일반화.
-- **Lightweight at inference**: 인퍼런스에서는 텍스트만 인코딩하므로 비용이 낮음(embedding 캐시 가능).
+- **Multimodal alignment**: 텍스트–이미지 쌍 기반의 contrastive 학습으로 두 모달리티를 같은 semantic space에 정렬
+- **Generalization**: 거대 웹 스케일 데이터로 학습되어 **스타일·콘셉트** 전반에 강한 일반화
+- **Lightweight at inference**: 인퍼런스에서는 텍스트만 인코딩하므로 비용이 낮음(embedding 캐시 가능)
 
-> 참고: Stable Diffusion 1.x/SDXL은 CLIP 계열을 사용한다. (후속 계열/다른 파이프라인은 T5 등 다른 텍스트 인코더를 쓰기도 함. 여기서는 CLIP 사용 시나리오를 기준으로 설명.)
+> 참고: Stable Diffusion 1.x/SDXL은 CLIP 계열을 사용함 (후속 계열/다른 파이프라인은 T5 등 다른 텍스트 인코더를 쓰기도 함. 여기서는 CLIP 사용을 기준으로 설명.)
 
 
 #### 3.1.2 입력/토크나이징/출력
-- **Tokenization**: BPE 기반 토크나이저 사용. 일반적으로 **max length = 77 tokens** (SD 1.x/SDXL).
-  - 길이 초과분은 **truncate**됨 → 중요한 키워드는 앞쪽에 배치.
-- **Special tokens**: `[BOS] ... [EOS] [PAD]`.
-- **Hidden states (per-token)**: shape `(B, T, D)` — **T≈77**, **D≈768**(ViT-L/14 계열).  
-  → **Cross-Attention의 K/V**로 사용.
-- **Pooled embedding (CLS/mean)**: shape `(B, D)` — SDXL 등 일부 아키텍처에서 **추가 조건 채널**로도 활용.
 
+**Tokenization**: BPE 기반 토크나이저 사용. 일반적으로 **max length = 77 tokens** (SD 1.x/SDXL)
+  - Tokenization은 사용자가 입력한 문장을 **컴퓨터가 이해할 수 있는 단위(토큰)**로 분할하는 과정
+    Stable Diffusion의 CLIP은 단어를 직접 이해하지 않고,  
+    각 단어를 **indexed embedding**로 변환해야만 처리할 수 있다.  
+
+  - CLIP은 **BPE(Byte Pair Encoding)** 기반 토크나이저를 사용한다.  
+    - 긴 단어를 자주 등장하는 부분(subword) 단위로 분할해 어휘 수를 줄이면서 의미 보존.  
+    - ex) “strawberries” → “straw”, “ber”, “ries”  
+    - 이런 방식으로 **새로운 단어**나 **철자 변형(예: stylized, plural)** 도 안정적으로 인코딩 가능
+
+- 입력 문장은 다음 순서로 처리된다
+  1. **문장 정규화**: 소문자화, 불필요한 공백 제거 등 전처리.  
+  2. **Tokenization (BPE)**: 문장을 subword 단위로 분할하고 토큰 ID 시퀀스로 변환.  
+  3. **[BOS]/[EOS]/[PAD]** 토큰 추가: 문장의 시작/끝/빈 자리 표시용.  
+  4. **길이 제한 적용**: Stable Diffusion의 CLIP은 **최대 77 tokens**까지만 사용.  
+     → 초과 부분은 **truncate**되어 무시됨.  
+     → 따라서 중요한 단어는 **문장 앞부분**에 배치하는 것이 중요.
+ 
+  ex)Prompt: "A cute penguin wearing a clown costume"
+    → [BOS] a, cute, penguin, wearing, a, clown, costume, [EOS], [PAD]...
+    → token IDs: [49406, 320, 12345, 2891, 320, 7842, 9121, 49407, 0, ...]
+
+출력구조 : 
+  - **Per-token hidden states**
+  - shape: `(B, T, D)`  
+    - `B`: batch size  
+    - `T`: token 수 (≈77)  
+    - `D`: embedding dimension (ViT-L/14의 경우 768)  
+  - 각 토큰이 의미 벡터로 변환되어 UNet의 **Cross-Attention layer**에서 K/V(Key/Value)로 사용됨.  
+  - 즉, 각 단어가 이미지 생성 과정에서 **어떤 시각적 요소로 반영될지**를 결정.
+  
+  - **Pooled embedding (CLS/mean)**
+  - shape: `(B, D)`  
+  - 문장 전체의 전역적 의미(global meaning)를 나타내는 벡터.  
+  - SDXL 등에서는 **전체 스타일·분위기** 제어 신호로 사용.
+
+  
 
 #### 3.1.3 Cross-Attention로의 주입
 UNet의 각 블록에서 **Q/K/V**를 다음과 같이 구성:
@@ -133,17 +164,30 @@ UNet의 각 블록에서 **Q/K/V**를 다음과 같이 구성:
   \[
   \mathrm{Attn}(Q,K,V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
   \]
-- 직관: UNet 피처가 텍스트 토큰(단어/구)의 의미를 **선택적으로 참조**해 시각 세부 묘사에 반영.
+- 직관: UNet 피처가 텍스트 토큰(단어/구)의 의미를 **선택적으로 참조**해 시각 세부 묘사에 반영
 
 
 #### 3.1.4 Classifier-Free Guidance (CFG)와 Negative Prompt
-- **Unconditional branch**: 빈 문자열 `""`(또는 negative prompt)로 얻은 embedding을 별도로 계산.
+- **Unconditional branch**: 빈 문자열 `""`(또는 negative prompt)로 얻은 embedding을 별도로 계산
 - **Guidance**:
   \[
   \hat{\epsilon} = \epsilon_{\text{uncond}} + s \cdot \big(\epsilon_{\text{cond}} - \epsilon_{\text{uncond}}\big)
   \]
   - \( s \): guidance scale (권장 범위 예: **5–9**; 너무 크면 포즈/구도 왜곡, 너무 작으면 조건 약화)
-- **Negative prompt**: 원치 않는 개념을 명시(예: “blurry, low quality”) → **uncond** 대신 **neg** 임베딩 사용.
+- **Negative prompt**: 원치 않는 개념을 명시(예: “blurry, low quality”) → **uncond** 대신 **neg** 임베딩 사용
+
+---
+
+### 3.2 VAE
+
+
+---
+
+### 3.3 UNET
+
+---
+
+### 3.4 Scheduler
 
 
 ---
