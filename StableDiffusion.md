@@ -1,7 +1,5 @@
 # Stable Diffusion 정리
 
-<details>
-<summary>목차</summary>
 
 1. [Overview](#1-overview)  
 2. [Fundamental Principle](#2-fundamental-principle)  
@@ -22,7 +20,6 @@
 6. [Stable Diffusion의 의의](#6-stable-diffusion의-의의)  
 7. [Stable Diffusion의 확장 모델](#7-stable-diffusion의-확장-모델)
 
-</details>
 ---
 
 ## 1. Overview
