@@ -83,7 +83,8 @@
 ---
 
 ## 6. Integration Flow  
-------  
+
+추후 추가  
 (Flow diagram 예시)  
 1️⃣ Input condition maps  
 → 2️⃣ Latent encoding (VAE)  
@@ -91,7 +92,6 @@
 → 4️⃣ Step scheduling (LCM + UniPCMultistep)  
 → 5️⃣ Weighted loss 계산  
 → 6️⃣ Decoding & Output  
-------  
 
 ---
 
