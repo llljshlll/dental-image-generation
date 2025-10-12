@@ -1,10 +1,28 @@
 # Stable Diffusion 정리
 
-## 목차
-- [3.1 CLIP (Text Encoder)](#31-clip-text-encoder)
-- [3.2 UNet (Denoiser)](#32-unet-denoiser)
-- [3.3 Scheduler](#33-scheduler)
-- [3.4 VAE (Decoder)](#34-vae-decoder)
+<details>
+<summary>목차</summary>
+
+1. [Overview](#1-overview)  
+2. [Fundamental Principle](#2-fundamental-principle)  
+ 2.1 [Embedding](#21-embedding)  
+ 2.2 [Image Generation (Mapping & Interpolation)](#22-image-generation-mapping--interpolation)  
+ 2.3 [Refine Image (Diffusion Process)](#23-refine-image-diffusion-process)  
+3. [Detailed Architecture](#3-detailed-architecture)  
+ 3.1 [CLIP (Text Encoder)](#31-clip-text-encoder)  
+  3.1.1 [Why CLIP?](#311-why-clip)  
+  3.1.2 [입력/토크나이징/출력](#312-입력토크나이징출력)  
+  3.1.3 [Cross-Attention로의 주입](#313-cross-attention로의-주입)  
+  3.1.4 [Classifier-Free Guidance (CFG)와 Negative Prompt](#314-classifier-free-guidance-cfg와-negative-prompt)  
+ 3.2 [VAE](#32-vae)  
+ 3.3 [UNET](#33-unet)  
+ 3.4 [Scheduler](#34-scheduler)  
+4. [Stable Diffusion의 학습 과정](#4-stable-diffusion의-학습-과정)  
+5. [결과 및 특징](#5-결과-및-특징)  
+6. [Stable Diffusion의 의의](#6-stable-diffusion의-의의)  
+7. [Stable Diffusion의 확장 모델](#7-stable-diffusion의-확장-모델)
+
+</details>
 ---
 
 ## 1. Overview
