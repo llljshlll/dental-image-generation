@@ -57,14 +57,14 @@
 
 ## 3. System Overview
 
-
+```
 Input (lighting map, segmentation map, ...)
 └─ Preprocess (resize/normalize, optional blending)
 └─ Encoder / VAE
 └─ UNet (+ ctrLoRA adapters)
 └─ Scheduler: LCM + UniPCMultistep
 └─ Decoder / VAE → Output frame (< 1s)
-
+```
 - **속도**: Stream Diffusion + **LCM**(스텝 단축) + **UniPC**(안정화)
 - **정합성**: **ctrLoRA**로 조건 일관성 확보
 - **도메인 특화**: **segmentation-weighted loss**로 치아 디테일 강화
