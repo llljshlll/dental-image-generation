@@ -2,7 +2,7 @@
 
 ---
 
-## 1. Architecture Overview
+## 1. Project Overview
 본 프로젝트는 Stable Diffusion 기반의 이미징 파이프라인을 **실시간(1초 이하)** 으로 구현하면서, **치아 디테일과 구조적 일관성**을 유지하는 것을 목표로 한다.  
 이를 위해 **=Real-time** 과 **Controllability** 의 두 축을 중심으로 설계되었다.
 
@@ -11,7 +11,7 @@
 
 
 ---
-## 2. Architecture Overview
+## 2. Architecture
 (전체 아키텍처 다이어그램 추후 삽입: Input → Encoder → UNet(+ctrLoRA) → Scheduler → Decoder)  
 
 
@@ -41,7 +41,8 @@
   → 세부 설정: [1_2_schedulers.md](1_2_schedulers.md)
   
 5. Loss & Weighting  
-  - 기본 objective: predicted noise와 target noise의 MSE  
+  - 기본 objective: predicted noise와 target noise의 MSE
+ <img src="images/segmentation_weighting_loss.png" alt="loss" width=600>  
   - **Segmentation-weighted Loss**로 치아 영역 gradient 증폭  
   - weighting factor: 1.0 / 2.0 / **5.0(최적)** / 8.0  
   → 실험 결과: [2_4_seg_weighting.md](2_4_seg_weighting.md)
@@ -85,6 +86,7 @@
 ## 6. Integration Flow  
 
 추후 추가  
+  <img src="images/dataset.png" alt="dataset" width=600>  
 (Flow diagram 예시)  
 1️⃣ Input condition maps  
 → 2️⃣ Latent encoding (VAE)  
@@ -92,6 +94,8 @@
 → 4️⃣ Step scheduling (LCM + UniPCMultistep)  
 → 5️⃣ Weighted loss 계산  
 → 6️⃣ Decoding & Output  
+
+입출력 데이터 흐름도 추가  
 
 ---
 
