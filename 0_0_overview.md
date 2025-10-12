@@ -13,7 +13,7 @@
 ---
 ## 2. Architecture
 (전체 아키텍처 다이어그램 추후 삽입: Input → Encoder → UNet(+ctrLoRA) → Scheduler → Decoder)  
-
+  <img src="images/architecture.png" alt="Architecture" width=600> 
 
 ---
 
@@ -86,7 +86,7 @@
 ## 6. Integration Flow  
 
 추후 추가  
-  <img src="images/dataset.png" alt="dataset" width=600>  
+  <img src="images/integration_flow.png" alt="integration_flow" width=600>  
 (Flow diagram 예시)  
 1️⃣ Input condition maps  
 → 2️⃣ Latent encoding (VAE)  
