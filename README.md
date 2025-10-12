@@ -1,5 +1,5 @@
 # Real-Time Dental Image Generation with Stream Diffusion + ctrLoRA
-**Goal:** 실시간 Dental 영상 생성에서 구조적 일관성과 디테일 유지 개선  
+**Goal:** 실시간 Dental 이미지 생성에서 조건 기반 디테일 유지 개선  
 **Keywords:** Stable Diffusion, StreamDiffusion, ctrLoRA, ControlNet++, Weighted LoRA
 
 > - **문제**: Stable Diffusion 기본 파이프라인은 **condition의 디테일 보존 한계**, **실시간성 미달**
