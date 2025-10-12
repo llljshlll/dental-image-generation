@@ -9,7 +9,7 @@
 ---
 
 ## 🔗 Quick Links
-- 시스템 개요: **[00_overview.md](0_0_overview.md)**
+- 시스템 개요: **[0_0_overview.md](0_0_overview.md)**
 - real-time:
   - DMD vs Stream / 원리: **[1_0_stream_diffusion.md](1_0_stream_diffusion.md)**
   - TAESD ↔ VAE 비교: **[1_1_taesd.md](1_1_taesd.md)**
