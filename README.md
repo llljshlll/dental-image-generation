@@ -9,7 +9,7 @@
 ---
 
 ## 🔗 Quick Links
-- 시스템 개요: **[00_overview.md](00_overview.md)**
+- 시스템 개요: **[00_overview.md](0_0_overview.md)**
 - real-time:
   - DMD vs Stream / 원리: **[1_0_stream_diffusion.md](1_0_stream_diffusion.md)**
   - TAESD ↔ VAE 비교: **[1_1_taesd.md](1_1_taesd.md)**
@@ -69,7 +69,7 @@ Input (lighting map, segmentation map, ...)
 - **정합성**: **ctrLoRA**로 조건 일관성 확보
 - **도메인 특화**: **segmentation-weighted loss**로 치아 디테일 강화
 
-더 자세히: 개요 [00_overview.md](00_overview.md), 실시간 최적화 [1_0/1_1/1_2], ctrLoRA [2_1/2_2]
+더 자세히: 개요 [00_overview.md](0_0_overview.md), 실시간 최적화 [1_0/1_1/1_2], ctrLoRA [2_1/2_2]
 
 ---
 
@@ -107,7 +107,7 @@ Input (lighting map, segmentation map, ...)
 - **자세히**: 원인 분석 [2_3_multi_condition.md](2_3_multi_condition.md), 완화 실험 [2_4_seg_weighting.md](2_4_seg_weighting.md)
 
 
-### 8. Limitations & Next
+### 6. Limitations & Next
 
 - 한계: 극단 조명/각도에서 드물게 경계 깨짐, 멀티컨디션 완전한 disentangle 미흡
 - 다음: ControlNet++(layout/content 분리) 적용
