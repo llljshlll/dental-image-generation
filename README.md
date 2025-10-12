@@ -97,6 +97,7 @@ Input (lighting map, segmentation map, ...)
 | Baseline SD(DDIM) | 20–50 | DDIM | VAE | … | 지연 큼 |
 | **LCM** | 4–8 | LCM | VAE | **< 1s** | **속도↑, 질감↓** |
 | **UniPC** | 4–8 | **UniPC** | VAE | **< 1s** | **속도 유지, 질감 회복** ✅ |
+
 → 세부: [1_2_schedulers.md](1_2_schedulers.md)
 
 ### 5.3 Multi-Condition Interference → Seg-Weighted 완화
