@@ -1,39 +1,16 @@
-# Real-Time Dental Image Generation with Stable Diffusion
+# Streaming Diffusion for Real-Time Dental Image Generation
+**Goal:** 실시간 Dental 영상 생성에서 구조적 일관성과 디테일 유지 개선  
+**Keywords:** Stable Diffusion, StreamDiffusion, ctrLoRA, ControlNet++, Weighted LoRA
 
-## 📌 Description
-This project implements a **real-time Stable Diffusion-based system** for dental image generation, focusing on **enhancing structural details of teeth**.  
-By integrating **StreamDiffusion**, **ControlNet**, and **segmentation-guided LoRA**, the model restores fine details while maintaining **real-time inference speed**.  
-
-**Key Features:**
-- Real-time image generation pipeline
-- Enhanced structural detail in dental imagery
-- Integration of StreamDiffusion + ControlNet + Segmentation-guided LoRA
-- Potential applications: dental imaging, interactive medical simulation
+<img src="images/pipeline_overview.png" width="700"/>
 
 ---
 
-## ⚙️ Installation
-```bash
-# Clone the repository
-git clone https://github.com/username/dental-image-generation.git
-cd dental-image-generation
+## Overview
+이 프로젝트는 Stable Diffusion 기반 dental image generation의 **real-time 성능 저하** 및  
+**세부 디테일 손실** 문제를 해결하기 위해 진행되었습니다.
 
-# Create environment
-conda create -n dental-ai python=3.10 -y
-conda activate dental-ai
-
-# Install requirements
-pip install -r requirements.txt
-```
----
-
-## 🚀 Usage
-```bash
-# Run inference
-python inference.py \
-  --input ./examples/input.png \
-  --output ./results/output.png \
-  --config ./configs/streamdiffusion_dental.yaml \
-  --ckpt ./ckpts/dental_lora.ckpt
-```
-
+- **Stable Diffusion** → 기본 구조 학습  
+- **Stream Diffusion** → 실시간 추론 구조 적용  
+- **ControlNet / LoRA / ctrLoRA** → 조건 기반 제어 실험  
+- **Weighted LoRA + ControlNet++** → multi-condition interference 문제 해결
