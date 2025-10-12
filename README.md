@@ -15,11 +15,10 @@
   - TAESD ↔ VAE 비교: **[1_1_taesd.md](1_1_taesd.md)**
   - 스케줄러(LCM/UniPC): **[1_2_schedulers.md](1_2_schedulers.md)**
 - control:
-  - controlLoRA/ctrLoRA/SDXS 비교: **[2_0_ctrl_families.md](2_0_ctrl_families.md)**
-  - ctrLoRA 메커니즘: **[2_1_ctrlora_mechanics.md](2_1_ctrlora_mechanics.md)**
-  - ctrLoRA 학습(singe condition): **[2_2_ctrlora_training.md](2_2_ctrlora_training.md)**
-  - multi-condition interference : **[2_3_multi_condition.md](2_3_multi_condition.md)**
-- 다음 단계: **[3_0_controlnetpp_plan.md](3_0_controlnetpp_plan.md)**
+  - controlLoRA vs ctrLoRA vs SDXS / 원리: **[2_0_ctrlora.md](2_0_ctrlora.md)**
+  - ctrLoRA 학습(singe condition): **[2_1_ctrlora_training.md](2_1_ctrlora_training.md)**
+  - multi-condition interference : **[2_2_multi_condition.md](2_2_multi_condition.md)**
+  - 다음 단계: **[2_3_controlnetpp_plan.md](2_3_controlnetpp_plan.md)**
 
 ---
 
@@ -50,7 +49,7 @@
 | controlLoRA | LoRA 기반 제어 용이 | 도메인에서 컨디션 정합성 제한 |  |
 | **ctrLoRA** | **조건 일관성 양호**, **저자원 학습**, 멀티컨디션 지원 | 멀티컨디션 간섭 발생 | ✅ |
 | SDXS | 경량/속도 장점 | 컨디션 정합성/품질 한계 |  |
-→ 비교/선정 근거: [2_0_ctrl_families.md](2_0_ctrl_families.md), 메커니즘: [2_1_ctrlora_mechanics.md](2_1_ctrlora_mechanics.md)
+→ 비교/선정 근거: [2_0_ctrlora.md](2_0_ctrlora.md)
 
 
 ---
@@ -69,7 +68,7 @@ Input (lighting map, segmentation map, ...)
 - **정합성**: **ctrLoRA**로 조건 일관성 확보
 - **도메인 특화**: **segmentation-weighted loss**로 치아 디테일 강화
 
-더 자세히: 개요 [00_overview.md](0_0_overview.md), 실시간 최적화 [1_0/1_1/1_2], ctrLoRA [2_1/2_2]
+더 자세히: 개요 [0_0_overview.md](0_0_overview.md), 실시간 최적화 [1_0/1_1/1_2], ctrLoRA [2_0/2_1]
 
 ---
 
@@ -104,7 +103,7 @@ Input (lighting map, segmentation map, ...)
 - **증상**: lighting ↔ segmentation 충돌(ghosting/duplication/콘셉트 누출)  
 - **가설/완화**: 치아 영역 **gradient 비중↑** → 경계/에나멜 텍스처 향상  
 - **결과 요약**: \(w_{\text{tooth}}=\) **5.0**에서 품질–안정성 균형 최적  
-- **자세히**: 원인 분석 [2_3_multi_condition.md](2_3_multi_condition.md), 완화 실험 [2_4_seg_weighting.md](2_4_seg_weighting.md)
+- **자세히**: 원인 분석, 완화 실험 [2_2_multi_condition.md](2_2_multi_condition.md)
 
 
 ### 6. Limitations & Next
