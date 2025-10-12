@@ -45,7 +45,7 @@ Stream Diffusion은 **다층 최적화 파이프라인**이다:
 
 ---
 
-### ⚡ 2.2 Residual Classifier-Free Guidance (R-CFG)
+### 2.2 Residual Classifier-Free Guidance (R-CFG)
 > **핵심 개념:** 음(negative) 조건의 중복 계산 제거로 속도 향상
 
 - 기존 CFG: 각 step마다 `ε_c`(조건), `ε_uc`(비조건)을 모두 계산  
@@ -57,7 +57,7 @@ Stream Diffusion은 **다층 최적화 파이프라인**이다:
 
 ---
 
-### 🌿 2.3 Stochastic Similarity Filter (SSF)
+### 2.3 Stochastic Similarity Filter (SSF)
 > **핵심 개념:** 연속 프레임 간 유사도를 기준으로 확률적 스킵
 
 - 정적(static) 구간에서는 디퓨전 호출을 건너뛰어 전력 절감  
@@ -69,7 +69,7 @@ Stream Diffusion은 **다층 최적화 파이프라인**이다:
 
 ---
 
-## 📊 3. Quantitative Highlights
+## 3. Quantitative Highlights
 | Metric | Stream Batch | R-CFG | SSF | Combined |
 |:--------|:--------------|:------|:----|:-----------|
 | Throughput | **1.5×** | — | — | — |
@@ -79,7 +79,7 @@ Stream Diffusion은 **다층 최적화 파이프라인**이다:
 
 ---
 
-## 🧠 4. Comparison: Stream Diffusion vs DMD2
+## 4. Comparison: Stream Diffusion vs DMD2
 
 | 구분 | Stream Diffusion | DMD2 |
 |------|------------------|------|
@@ -91,13 +91,16 @@ Stream Diffusion은 **다층 최적화 파이프라인**이다:
 | **한계** | VRAM 사용량 증가 / 정적 장면에 유리 | 학습 비용 높고 증류 불안정 가능 |
 
 요약하자면,  
-- **DMD2**는 *“모델을 더 빠르게”* 만드는 접근,  
-- **Stream Diffusion**은 *“파이프라인을 더 효율적으로”* 만드는 접근이다.  
-두 방법은 **직교적**이며 병행 적용 가능하다:contentReference[oaicite:13]{index=13}:contentReference[oaicite:14]{index=14}.
+- **DMD2** : *“모델을 더 빠르게”* 만드는 접근
+- **Stream Diffusion** : *“파이프라인을 더 효율적으로”* 만드는 접근  
+전체 모델을 새로 tuning하는 DMD2 방식보다는, 이미 안정적으로 학습된 Stable Diffusion을 base로 유지하면서  
+ctrLoRA와 같은 detail-preserving 모듈*을 결합하는 것이 목적이었음
+=> base 모델의 구조나 파라미터를 변경하지 않고도 real-time performance를 달성할 수 있는 방법이
+  바로 **Stream Diffusion**이었기 때문에, 본 프로젝트에서는 **Stream Diffusion**을 선택하 
 
 ---
 
-## ⚙️ 5. Implementation Notes
+## 5. Implementation Notes
 - Stream Batch → Batch size와 offset을 조정해 VRAM–FPS 균형 맞춤  
 - R-CFG → Negative pass 1회만 수행, residual 재사용  
 - SSF → 유사도 계산: CLIP feature / cosine similarity  
@@ -106,13 +109,13 @@ Stream Diffusion은 **다층 최적화 파이프라인**이다:
 
 ---
 
-## ⚖️ 6. Limitations & Trade-offs
+## 6. Limitations & Trade-offs
 - **VRAM Dependency**: Stream Batch 폭이 커질수록 GPU 메모리 급증:contentReference[oaicite:16]{index=16}  
 - **Scene Dynamics**: SSF는 정적 장면엔 효과적이나, 급격한 장면 변화에서는 이득 제한:contentReference[oaicite:17]{index=17}
 
 ---
 
-## 🏁 7. Takeaways
+## 7. Takeaways
 ✅ Stream Diffusion은 **모델 구조 변경 없이**  
  - Stream Batch로 **FPS ↑**  
  - R-CFG로 **지연 ↓**  
