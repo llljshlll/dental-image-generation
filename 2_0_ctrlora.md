@@ -19,7 +19,7 @@
 ### 2.1 ControlNet 
 - **구조**: SD U-Net의 encoder/middle block을 **locked** 하고, **trainable copy(동일 구조의 학습 가능본)** 를 붙여 **zero-convolution(0으로 초기화된 1×1 conv)** 으로 합산. 초기 학습 안정성과 backbone 보호가 장점. 멀티 조건은 여러 ControlNet 출력을 더해 합성 가능. 
 - **특성**: 조건 타입마다 **새 ControlNet**을 학습해야 함(데이터·연산 부담 큼).
-<img src="images/2_0_ctrlora/controlNet_pipeline.png.png" alt="ControlNet" width=600>   
+<img src="images/2_0_ctrlora/controlNet_pipeline.png" alt="ControlNet" width=600>   
 
 ### 2.2 ControlLoRA
 - **아이디어**: **LoRA만**으로 condition input을 처리해 파라미터 수를 줄임.  
