@@ -5,46 +5,60 @@
 
 ---
 
-## 1. Overview
+## 1. Motivation
 
-**CtrLoRA = Controllable Image-to-Image Generation Framework**  
-```
-Input
-├── Condition Image (Canny, Depth, Segmentation, Pose, etc.)
-├── Text Prompt (optional)
-└── Additional Conditions (multi-condition possible)
-
-Process
-├── Condition Encoding → Pretrained VAE → Condition Embedding
-├── Base ControlNet → 공통 I2I 지식 학습 (shared backbone)
-├── LoRA (Low-Rank Adaptation) → 조건별 세부 특성 학습
-└── UNet Diffusion Backbone → 노이즈 예측 및 이미지 복원
-
-Output
-└── Stable Diffusion Decoder (VAE) → 제어된 고해상도 이미지 생성
-```
+- **ControlNet**은 조건 타입마다 **별도 네트워크를 처음부터 학습**해야 해서, **대규모 데이터(수백만 쌍)와 수백 GPU시간**이 든다 → 새로운 조건을 빠르게 실험·배포하기 어렵다.
+- **우리 요구사항**: lighting / segmentation 등 **복수 조건**을 함께 쓰며, 도메인 특화(치아) 실험을 **저자원으로 빠르게 반복**해야 함.
+- **핵심 선택지**:  
+  1) ControlNet(조건별 full model)  
+  2) ControlLoRA(기존 SD에 LoRA만)  
+  3) **CtrLoRA(공유 Base ControlNet + 조건별 LoRA)**
 
 
-- **Base + LoRA 구조**  
-  → Base ControlNet이 **공통적인 Image-to-Image 생성 지식**을 학습하고,  
-    LoRA가 **각 조건의 고유 특성**을 저비용으로 학습함.
+## 2 Principles
+### 2.1 ControlNet 
+- **구조**: SD U-Net의 인코더/미들 블록을 **동결(locked)** 하고, **동일 구조의 학습 복제본(trainable copy)** 을 붙여 **zero-convolution(0으로 초기화된 1×1 conv)** 으로 합산. 초기 학습 안정성과 backbone 보호가 장점. 멀티 조건은 여러 ControlNet 출력을 더해 합성 가능. 
+- **특성**: 조건 타입마다 **새 ControlNet**을 학습해야 함(데이터·연산 부담 큼).
 
-- **Few-shot Adaptation (1,000 images / <1hr on 1 GPU)**  
-  → 새로운 조건 추가 시 **ControlNet 전체 재학습 없이**,  
-    **LoRA만 학습**하여 빠르게 적응 가능.
+### 2.2 ControlLoRA
+- **아이디어**: **LoRA만**으로 조건 입력을 처리해 파라미터 수를 줄임.  
+- **한계(보고)**: 제한된 데이터에서 성능 저하 보고 (survey/관련연구 맥락).
 
-- **Multi-Conditional Generation 지원**  
-  → 여러 LoRA를 조합해 하나의 이미지에  
-    **다중 조건 제어 (예: Segmentation + Lighting)** 가능.
+### 2.3 **CtrLoRA**
+- **핵심 구조**:  
+  - **Base ControlNet(공유 모듈)** 을 **여러 기본 조건**으로 대규모 학습 → I2I의 **공통지식**을 학습.  
+  - 각 조건에는 **LoRA 분기(조건별 LoRA)** 만 추가·학습(저자원).  
+  - 새로운 조건은 **Base는 고정(frozen)**, **LoRA만 신규 학습**.
+- **조건 임베딩 설계**: 원 ControlNet의 랜덤 CNN 대신 **SD의 사전학습 VAE를 임베딩**으로 써 **수렴 가속**.
+- **멀티 조건 합성**: 해당 조건의 LoRA가 장착된 Base 출력을 **합산하여 조합** 가능(구조적으로 깔끔). 
 
-- **Pretrained VAE 기반 Condition Embedding**  
-  → 기존의 무작위 CNN 대신 Stable Diffusion의 **VAE Encoder**를 활용해  
-    조건 이미지를 잠재공간에 임베딩함.  
-  → 학습 수렴 속도 향상 및 ControlNet의 **Sudden Convergence 현상 제거**.
+## 3 자원·비용 비교 (N개의 조건을 쓸 때)
+
+| 항목 | ControlNet | **CtrLoRA** |
+|---|---:|---:|
+| 조건별 학습 파라미터 | **361M × N** | **360M (공유 Base) + 37M × N** |
+| 신규 조건 학습 데이터 | **수백만 쌍** 권장 | **~1k 쌍** 수준도 실용적 |
+| 신규 조건 학습 시간 | **수백 GPU-hr**(A100 사례) | **< 1 hr** (단일 4090 사례 보고) |
+| 멀티 조건 도입 비용 | **모델 N개** 필요 | **LoRA N개** 추가 |
+| 실무 민첩성 | 낮음 | **높음** |
+
+- **ControlNet**: 한두 조건만, 예산 충분, 파운더멘털부터 크게 튜닝하고 싶을 때. 
+- **ControlLoRA**: 초저자원·간이 실험(성능 상한선 낮을 수 있음). 
+- **CtrLoRA**:
+  - **여러 조건**을 **빠르게 실험/조합**  
+  - **낮은 추가 파라미터(37M/조건)**  
+  - **적은 데이터(~1k)** 로도 **실용 품질**  
+
+## 4 Why **CtrLoRA** for us (치아 도메인, 다조건)
+- **여러 condition을 동시에** 다뤄야 하고, 실험을 **반복**해야 함 → **조건별 LoRA만 추가/교체**하면 되므로 **가볍고 민첩**. 
+- **학습 비용/배포 부담**이 **조건 수에 선형으로 커지지 않음**(Base 공유). 
+- **세그멘테이션/라이팅** 등 **복수 조건 합성**이 구조적으로 간단(출력 합산). **멀티컨디션 실험**에 유리. 
+- **ControlNet 대비**: 새 조건을 테스트하려고 **361M 전체**를 또 학습·배포할 필요가 없음. 
+
 
 ---
 
-## 2. Fundamental Principle
+## 5. CtrLoRA 메커니즘
 
 **CtrLoRA**는 기존 **ControlNet**의 구조를 확장하여,  
 여러 조건 이미지를 효율적으로 학습하고 새로운 조건에도 빠르게 적응할 수 있는  
@@ -59,7 +73,7 @@ Output
 
 ---
 
-### 2.1 Condition Embedding
+### 5.1 Condition Embedding
 
 - 기존 ControlNet은 **무작위 초기화된 CNN**을 사용해 조건 이미지를 임베딩했으나,  
   이는 학습 초기에 의미 있는 피처를 추출하지 못해 **수렴이 느리고 불안정**했다.  
@@ -77,7 +91,7 @@ Output
 
 
 
-### 2.2 Base ControlNet (Shared Backbone)
+### 5.2 Base ControlNet (Shared Backbone)
 
 - 여러 조건(canny, depth, segmentation, skeleton 등)을 하나의 네트워크로 학습한다.  
 - 모든 condition 데이터를 **공통 Loss Function** 아래서 학습하여  
@@ -89,7 +103,7 @@ Output
 > LoRA = Condition Expert Module
 
 
-### 2.3 Condition-specific LoRA (Low-Rank Adaptation)
+### 5.3 Condition-specific LoRA (Low-Rank Adaptation)
 
 - LoRA는 큰 weight 행렬의 변화를 **저랭크 분해(ΔW = BA)** 형태로 근사하여  
   **학습 가능한 파라미터 수를 90% 이상 절감**한다.  
@@ -103,7 +117,7 @@ Output
 
 
 
-### 2.4 Denoising & Image Generation (Diffusion Process)
+### 5.4 Denoising & Image Generation (Diffusion Process)
 
 - Base ControlNet과 LoRA의 출력은 Stable Diffusion의 UNet으로 전달되어  
   **조건 기반 노이즈 제거(reverse diffusion)** 를 수행한다.  
@@ -114,7 +128,7 @@ Output
 
 ---
 
-## 3. Detailed Architecture
+## 6. Detailed Architecture
 
 CtrLoRA는 **ControlNet + LoRA + Pretrained VAE**를 결합한  
 **확장형 Controllable Latent Diffusion 구조**로 설계되어 있다.  
@@ -138,12 +152,12 @@ VAE Decoder → 제어된 이미지 복원
 
 ---
 
-### 3.1 Base ControlNet (Shared Backbone)
+### 6.1 Base ControlNet (Shared Backbone)
 
 Base ControlNet은 **여러 조건(Condition)**을 하나의 네트워크로 통합 학습하기 위해 설계된  
 **공유형 I2I(Image-to-Image) 생성 모듈**이다.
 
-#### 3.1.1 구조 개요
+#### 6.1.1 구조 개요
 - 기본적으로 Stable Diffusion의 **UNet encoder 구조**를 따르며,  
   입력으로 condition feature를 받아 latent representation을 변환한다.  
 - 각 block은 ControlNet의 residual branch를 포함하며,  
@@ -161,7 +175,7 @@ Base ControlNet은 **여러 조건(Condition)**을 하나의 네트워크로 통
 
 
 
-#### 3.1.2 학습 방식
+#### 6.1.2 학습 방식
 - Base ControlNet은 **9가지 base condition** (Canny, Depth, Skeleton, Segmentation 등)을 동시에 학습.  
 - 각 조건은 **개별 LoRA**가 연결된 형태로 주입되며,  
   Base ControlNet은 “공통적인 I2I 생성 지식”을 학습한다.  
@@ -175,7 +189,7 @@ Base ControlNet은 **여러 조건(Condition)**을 하나의 네트워크로 통
 
 
 
-#### 3.1.3 역할
+#### 6.1.3 역할
 - **공통적 이미지 생성 능력 학습 (General I2I knowledge)**  
   → 다양한 조건을 통해 “이미지 변환의 일반 원리”를 습득.  
 - **LoRA 학습의 기반 모델로 사용**  
@@ -186,12 +200,12 @@ Base ControlNet은 **여러 조건(Condition)**을 하나의 네트워크로 통
 
 ---
 
-### 3.2 LoRA (Low-Rank Adaptation)
+### 6.2 LoRA (Low-Rank Adaptation)
 
 LoRA는 **Base ControlNet 위에 부착되는 경량 적응 모듈**로,  
 각 condition의 **세부적 특성(local feature)**을 학습한다.
 
-#### 3.2.1 핵심 개념
+#### 6.2.1 핵심 개념
 - 기존 full fine-tuning에서는 모든 weight \( W \)를 직접 업데이트해야 하지만,  
   LoRA는 weight 변화를 **저랭크 근사(ΔW = B·A)** 로 표현한다.  
   - \( A \in \mathbb{R}^{r \times d} \), \( B \in \mathbb{R}^{d \times r} \), \( r \ll d \)
@@ -207,7 +221,7 @@ LoRA는 **Base ControlNet 위에 부착되는 경량 적응 모듈**로,
 
 
 
-#### 3.2.2 학습 및 적용
+#### 6.2.2 학습 및 적용
 1. Base ControlNet을 고정하고, 새로운 condition 데이터로 LoRA를 학습.  
 2. LoRA는 각 Linear Layer의 **Residual Update** 형태로 삽입됨.  
 3. 학습 완료 후, LoRA를 Base ControlNet과 합성하여 inference 수행:
@@ -221,7 +235,7 @@ LoRA는 **Base ControlNet 위에 부착되는 경량 적응 모듈**로,
 
 ---
 
-### 3.3 Condition Embedding Network
+### 6.3 Condition Embedding Network
 
 CtrLoRA의 핵심 중 하나는 **조건(condition) 이미지를 효율적으로 임베딩**하는 방식이다.  
 기존 ControlNet은 단순한 **랜덤 초기화 CNN(convolutional encoder)** 를 사용했지만,  
@@ -235,7 +249,7 @@ Base ControlNet + LoRA 입력
 
 
 
-#### 3.3.1 기존 ControlNet의 한계
+#### 6.3.1 기존 ControlNet의 한계
 - ControlNet은 condition image를 feature로 변환하기 위해  
   **임의 초기화된 CNN**을 사용.  
 - 학습 초반에는 유의미한 피처를 추출하지 못해,  
@@ -249,7 +263,7 @@ Base ControlNet + LoRA 입력
 
 
 
-#### 3.3.2 Pretrained VAE Encoder의 도입
+#### 6.3.2 Pretrained VAE Encoder의 도입
 CtrLoRA는 이를 해결하기 위해 **Stable Diffusion의 VAE Encoder**를 condition embedding network로 채택하였다.  
 즉, condition image는 VAE Encoder를 통해 즉시 **latent representation**으로 변환된다.
 
@@ -272,7 +286,7 @@ z_c = \text{VAE}_{enc}(c)
 
 
 
-#### 3.3.3 효과 및 장점
+#### 6.3.3 효과 및 장점
 - **빠른 수렴**: 학습 초기부터 의미 있는 condition feature를 전달함.  
 - **훈련 안정성 향상**: gradient 폭주나 loss 진동 현상 감소.  
 - **정확한 feature alignment**: VAE latent space와 ControlNet 입력 공간이 일치.  
@@ -284,7 +298,7 @@ z_c = \text{VAE}_{enc}(c)
 
 ---
 
-### 3.4 Inference (Multi-Conditional Generation)
+### 6.4 Inference (Multi-Conditional Generation)
 
 CtrLoRA의 추론(inference)은 **Base ControlNet**과 **여러 조건별 LoRA 모듈**을  
 동시에 조합하여 이미지를 생성하는 과정이다.  
@@ -305,7 +319,7 @@ VAE Decoder → 최종 이미지
 ```
 
 
-#### 3.4.1 Multi-Conditional Feature Aggregation
+#### 6.4.1 Multi-Conditional Feature Aggregation
 
 여러 LoRA를 동시에 적용할 때,  
 각 LoRA는 동일한 Base ControlNet의 feature map에 대해  
@@ -326,7 +340,7 @@ C_{\theta, \Psi}(z, c) = C_{\theta}(z) + \sum_{i=1}^{N} w_i \cdot L_{\psi_i}(z, 
 
 
 
-#### 3.4.2 Denoising Process
+#### 6.4.2 Denoising Process
 
 CtrLoRA는 Stable Diffusion의 denoising 과정과 동일하게 작동한다.  
 Base ControlNet과 LoRA의 출력을 UNet에 주입하여  
@@ -346,7 +360,7 @@ Classifier-Free Guidance Scale은 **7.5** 전후로 설정한다.
 
 
 
-#### 3.4.3 Conditional Strength & Guidance
+#### 6.4.3 Conditional Strength & Guidance
 
 각 LoRA의 기여도는 가중치 \( w_i \)로 조절 가능하며,  
 이 값을 높일수록 해당 조건의 영향력이 커진다.
@@ -362,7 +376,7 @@ Classifier-Free Guidance Scale은 **7.5** 전후로 설정한다.
 
 
 
-#### 3.4.4 Inference Pipeline Summary
+#### 6.4.4 Inference Pipeline Summary
 1. **Condition Encoding**: 모든 condition image → VAE Encoder → latent embedding 생성  
 2. **LoRA Aggregation**: 각 LoRA의 출력 weighted sum → Base ControlNet feature에 주입  
 3. **UNet Denoising**: Stable Diffusion의 latent space에서 noise 제거  
@@ -370,7 +384,7 @@ Classifier-Free Guidance Scale은 **7.5** 전후로 설정한다.
 
 
 
-#### 3.4.5 Model Size Comparison
+#### 6.4.5 Model Size Comparison
 
 CtrLoRA는 Base ControlNet을 고정한 채 LoRA 모듈만 추가 학습하기 때문에,  
 전체 파라미터 규모와 저장 용량이 기존 ControlNet보다 **대폭 감소**한다.
@@ -381,7 +395,7 @@ CtrLoRA는 Base ControlNet을 고정한 채 LoRA 모듈만 추가 학습하기 �
 | **Base ControlNet (Shared Backbone)** | 공통 I2I 지식 학습용 베이스 | 1.54 GB | 830 M | - |
 | **CtrLoRA (LoRA Module)** | 조건별 저랭크 학습 모듈 | 0.15 GB | 78 M | **≈10%** |
 
-> 💡 새로운 condition 추가 시, 전체 모델을 재학습할 필요 없이  
+> 새로운 condition 추가 시, 전체 모델을 재학습할 필요 없이  
 > LoRA(148MB)만 추가하면 되므로 **GPU 시간 및 저장소 비용을 90% 이상 절감**.
 
 ---
