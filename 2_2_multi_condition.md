@@ -1,6 +1,4 @@
-# 2_2_multi_condition.md
-**Title:** Multi-Condition (Segmentation + Lighting) – Interference 분석과 완화  
-**Goal:** 단일 조건으로 학습한 ctrLoRA(각 맵용 LoRA)를 **동시에 조합**했을 때 발생하는 간섭을 분석하고, **블렌딩 + 가중 손실**로 완화한 과정을 정리한다.
+# 2_2_Multi-Condition (Segmentation + Lighting) – Interference 분석과 완화  
 
 ---
 
