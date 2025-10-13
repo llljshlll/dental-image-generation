@@ -1,12 +1,12 @@
-# ctrLoRA training pipeline
+# Training ctrLoRA – Single-Condition on Dental Domain
 
 ---
 
 ## 1. 데이터 준비
-- **데이터 구성**: lighting map과 segmentation map을 **blending**하여 condition 이미지를 만듦  
+- **데이터 구성**: lighting map, segmentation map과 같은 single condition   
   <img src="images/dataset.png" alt="dataset" width=600>   
 - **데이터 형태**:  
-  - **Source (condition)**: lighting map + segmentation map blending 이미지  
+  - **Source (condition)**: lighting map과 같은 single condition 
   - **Target (ground truth)**: 실제 치아와 유사한 렌더링 이미지  
   - **Prompt**: 치아 PNG 파일 이름을 기반으로 자동 생성
     - 템플릿:  
@@ -17,7 +17,7 @@
       ```  
       → 괄호 속 단어를 파일명에 맞춰 교체
 - **샘플 수**: 2,000개
-- **해상도**: 512×512 (고정 권장) 
+- **해상도**: 512×512 
 
 ---
 
@@ -242,7 +242,7 @@
 
 ---
 
-## 7) 실제 학습 시간/리소스(네 로그 기반)
+## 7) 실제 학습 시간/리소스
 
 - **배치사이즈**: 1  
 - **max_step**: 5,000  
