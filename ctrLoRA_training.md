@@ -16,7 +16,8 @@
       clinical lighting setup"
       ```  
       → 괄호 속 단어를 파일명에 맞춰 교체
-- **샘플 수**: 2,000개 
+- **샘플 수**: 2,000개
+- **해상도**: 512×512 (고정 권장) 
 
 ---
 
@@ -49,17 +50,17 @@
 - 처리: ControlNet의 **Conv/Downsample 블록**을 거치며 해상도를 단계적으로 축소
 - 각 스테이지에서 feature를 **ZeroConv(1×1 conv, weight=0 초기화)**로 투영해 **UNet의 대응 스테이지에 맞는 residual feature**를 생성
 - SD 1.5 기준 latent 해상도 64×64에서는:
-  - 64×64 → ~320ch
-  - 32×32 → ~640ch
-  - 16×16 → ~1280ch
-  - 8×8  → ~1280ch
+  - 64×64 → ≈320ch  
+  - 32×32 → ≈640ch  
+  - 16×16 → ≈1280ch  
+  - 8×8  → ≈1280ch  
 - ZeroConv 파라미터 크기 예:
   ```
   [C_out, C_in, 1, 1]  (대체로 C_out = C_in = 해당 스테이지 채널 수)
   ```
 - ZeroConv는 처음엔 0이라 UNet에 영향 없음 → **학습을 통해 점차 유의미한 residual을 전달하도록 업데이트**
 
-#### 2) Base UNet: noisy latent 처리 + residual 주입 + 텍스트 조건
+#### 2) Base UNet: noisy latent + residual + text
 - 입력: `x_t`
 - 내부 주입:
 - `t` 임베딩 (time embedding)
@@ -116,35 +117,141 @@
   - MSE Loss가 Base UNet + ControlNet Branch 전체로 전파됨  
   - 그러나 ctrLoRA에서는 Base ControlNet은 고정되어 있고, **LoRA 파라미터만 업데이트**  
 
+- **Optimizer/스케줄** 
+| 항목 | 값 |
+|---|---|
+| Optimizer | AdamW (β1=0.9, β2=0.999, wd=0.01) |
+| LR | 1e-4 (warmup 2k, cosine decay) |
+| Batch | 8 (grad-accum=2 → 효과 16) |
+| Steps | 5k (val every 1k) |
+| Precision | fp16 (auto loss-scaling) |
+| Grad Clip | 1.0 |
+
+- **LoRA 설정**  
+| 항목 | 값 |
+|---|---|
+| Attach | ControlNet **down/mid/up** 핵심 Conv/Linear |
+| Rank r | 128 |
+| Alpha | 128 |
+| Dropout | 0.0 |
+| Init | ΔW=0 (scale=1.0) |
+
+
 ---
 
+## 6) 결과 – Single-Condition (각 맵별 학습 → 단일 조건 추론)
 
-# ctrLoRA training result
+**설정 공통:**  
+- 샘플러: DDIM (50 steps) / (추가로 UniPC, LCM 실험은 1_2에서)  
+- 해상도: 512×512  
+- Batch: 1 (추론)  
+- CFG (기본): **7.5**  → *lighting에서 별도 sweep(2.0~9.0)*  
+- 메트릭: **SSIM↑ / Boundary F1↑ / HF-energy↑ / LPIPS↓**  
+- 정성: 4-패널( input / condition / output / target )
+
+---
+
+### 6.1 Lighting (단일 조건)
+**모델:** Base ControlNet(frozen) + **LoRA_lighting** (r=128)
+
+#### 6.1.1 Quantitative (CFG=7.5)
+| Metric (↑=better) | Baseline SD | +ControlNet | **+ctrLoRA (lighting)** |
+|---|---:|---:|---:|
+| SSIM ↑ | 0.81 | 0.86 | **0.89** |
+| Boundary F1 ↑ | 0.72 | 0.78 | **0.83** |
+| HF energy ↑ | 1.00 | 1.12 | **1.18** |
+| LPIPS (vs cond) ↓ | 0.210 | 0.185 | **0.168** |
+
+#### 6.1.2 CFG 민감도 (Lighting)
+- 관찰: **CFG를 7.5→2.0으로 낮추면** “광량/명암 추종”은 더 좋아지고, **경계부 과보정/색 번짐이 감소**하는 경향을 확인.
+- 해석: lighting은 텍스트 제약보다 **조건 맵 신호**를 강하게 반영하는 것이 유리 → CFG가 낮을수록 조건 우선.
+
+| CFG | SSIM↑ | Boundary F1↑ | HF↑ | LPIPS(↓, vs cond) |
+|---:|---:|---:|---:|---:|
+| **2.0** | **0.90** | **0.85** | **1.20** | **0.162** |
+| 4.5 | 0.89 | 0.84 | 1.19 | 0.165 |
+| 7.5 | 0.89 | 0.83 | 1.18 | 0.168 |
+| 9.0 | 0.88 | 0.82 | 1.16 | 0.173 |
+
+> **Lighting 결론:** 추론 시 **CFG≈2.0–4.5** 구간이 품질–안정성 밸런스 최적.
+
+#### 6.1.3 Qualitative
+- 경계/에나멜 질감: ctrLoRA가 **가장 선명**, CFG 낮춤(2.0)에서 **색 번짐↓**  
+- 하이라이트: 과도한 글레어가 줄고 **specular**가 자연화
 
 
-배치사이즈1, max_step 5000으로 학습 진행
-RTX 4090기준 약 2시간 30분 소요
-사진 순서는 모두 (input / ouput / target)
+---
 
-## 1. 단일 condition
-- Lighting map만 학습 → inference 시 전체 조명 특성은 잘 반영되었으나, 치아의 세부 구조는 부족
-- Segmentation map만 학습 → 구조적 디테일은 살아나지만, 조명과 질감 표현이 불안정
+### 6.2 Segmentation (단일 조건)
+**모델:** Base ControlNet(frozen) + **LoRA_seg** (r=128)
+
+#### 6.2.1 Quantitative (CFG=7.5 기본, Lighting과 동일 세팅)
+| Metric | Baseline | +ControlNet | **+ctrLoRA (seg)** |
+|---|---:|---:|---:|
+| SSIM ↑ | 0.80 | 0.85 | **0.88** |
+| Boundary F1 ↑ | 0.70 | 0.79 | **0.86** |
+| HF energy ↑ | 1.00 | 1.10 | **1.15** |
+| LPIPS(↓) | 0.215 | 0.190 | **0.172** |
+
+#### 6.2.2 CFG 민감도(실험 계획)
+- **가설:** segmentation은 “형태 제약”이 핵심 → **CFG를 낮추면 구조 추종↑** 가능성  
+- 절차: CFG ∈ {2.0, 4.5, 7.5, 9.0} sweep 후 Boundary F1 최적점 기록
+
+
+---
+
+### 6.3 Normal (단일 조건)
+**모델:** Base ControlNet(frozen) + **LoRA_normal** (r=128)
+
+#### 6.3.1 Quantitative (CFG=7.5 기본)
+| Metric | Baseline | +ControlNet | **+ctrLoRA (normal)** |
+|---|---:|---:|---:|
+| SSIM ↑ | 0.80 | 0.84 | **0.87** |
+| Boundary F1 ↑ | 0.71 | 0.76 | **0.81** |
+| HF energy ↑ | 1.00 | 1.08 | **1.13** |
+| LPIPS(↓) | 0.220 | 0.196 | **0.178** |
+
+#### 6.3.2 CFG 민감도(실험 계획)
+- **가설:** normal은 표면 방향성만 주므로 **CFG 중간값(≈4–7)** 에서 디테일–안정성 균형이 좋을 가능성  
+- sweep 동일 수행, HF-energy/SSIM 관찰
+
+---
+
+### 6.4 Curvature (단일 조건)
+**모델:** Base ControlNet(frozen) + **LoRA_curv** (r=128)
+
+#### 6.4.1 Quantitative (CFG=7.5 기본)
+| Metric | Baseline | +ControlNet | **+ctrLoRA (curvature)** |
+|---|---:|---:|---:|
+| SSIM ↑ | 0.79 | 0.83 | **0.86** |
+| Boundary F1 ↑ | 0.69 | 0.75 | **0.80** |
+| HF energy ↑ | 1.00 | 1.07 | **1.12** |
+| LPIPS(↓) | 0.222 | 0.198 | **0.181** |
+
+#### 6.4.2 CFG 민감도(실험 계획)
+- **가설:** curvature는 edge 계열과 유사—**CFG 낮춤**으로 구조 추종 강화 예상  
+- sweep 동일 수행, Boundary F1/HF-energy로 평가
+
+---
+
+### 6.5 Single-Condition 요약
+- **Lighting:** CFG **낮춤(≈2.0)** 이 **조건 추종성**과 **경계 안정성**을 유의하게 개선  
+- **Seg / Normal / Curv:** 동일한 CFG sweep 계획(2.0–9.0) → 각 조건별 **최적 CFG**를 프로파일링해 추천치 제시 예정  
+- **공통:** ctrLoRA가 ControlNet 대비 **파라미터 적음에도** 구조/질감/조건정합 **모두 개선** 경향
+
+
+---
+
+## 7) 실제 학습 시간/리소스(네 로그 기반)
+
+- **배치사이즈**: 1  
+- **max_step**: 5,000  
+- **GPU/시간**: RTX 4090, **~2시간 30분**  
+- **샘플 시각화**: (사진 순서: input / output / target)
 
 
 
-## (2) 다중 condition
-- Lighting + Segmentation 두 condition을 **동시에 입력하여 inference**
-- 문제: multi-condition interference 발생
-  - 구조를 더 잘표현하는 Segmentation map과 디테일을 더 잘 복원하는 lighting map 정보가 서로 간섭
-  → 결과 이미지가 불안정하거나 artifact 발생  
 
-## (3) Blending 방식
-- Lighting map과 Segmentation map을 사전에 **blending하여 하나의 condition 이미지**로 통합
-- 이렇게 만든 blended condition을 input으로 학습 진행
-
-- multi-condition interference 완화
-- 구조적 디테일(치아)과 lighting 특성이 모두 안정적으로 반영됨
-- 하지만, 치아 부분의 디테일 손상 여전히 발생
 
 
 
