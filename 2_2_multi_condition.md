@@ -1,4 +1,4 @@
-# 2_2_Multi-Condition (Segmentation + Lighting) – Interference 분석과 완화  
+# Multi-Condition (Segmentation + Lighting) – Interference 분석, 완화  
 
 ---
 
