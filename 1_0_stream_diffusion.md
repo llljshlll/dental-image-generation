@@ -110,8 +110,8 @@ ctrLoRA와 같은 detail-preserving 모듈*을 결합하는 것이 목적이었�
 ---
 
 ## 6. Limitations & Trade-offs
-- **VRAM Dependency**: Stream Batch 폭이 커질수록 GPU 메모리 급증:contentReference[oaicite:16]{index=16}  
-- **Scene Dynamics**: SSF는 정적 장면엔 효과적이나, 급격한 장면 변화에서는 이득 제한:contentReference[oaicite:17]{index=17}
+- **VRAM Dependency**: Stream Batch 폭이 커질수록 GPU 메모리 급증
+- **Scene Dynamics**: SSF는 정적 장면엔 효과적이나, 급격한 장면 변화에서는 이득 제한
 
 ---
 
@@ -120,8 +120,7 @@ ctrLoRA와 같은 detail-preserving 모듈*을 결합하는 것이 목적이었�
  - Stream Batch로 **FPS ↑**  
  - R-CFG로 **지연 ↓**  
  - SSF로 **전력 ↓**  
- → **RTX 4090에서 91 FPS**, Diffusers AutoPipeline 대비 **59.6× throughput 향상**:contentReference[oaicite:18]{index=18}  
-
+ → **RTX 4090에서 91 FPS**, Diffusers AutoPipeline 대비 **59.6× throughput 향상**
 > **Next:**  
 > - [1_1_taesd.md] – 인코더(TAESD vs VAE) 속도/품질 비교  
 > - [1_2_schedulers.md] – LCM 및 UniPC 스케줄러 최적화
