@@ -4,7 +4,7 @@
 
 ## 1. 데이터 준비
 - **데이터 구성**: lighting map, segmentation map과 같은 single condition   
-  <img src="images/dataset.png" alt="dataset" width=600>   
+  <img src="images/2_1_ctrlora_training/dataset.png" alt="dataset" width=600>   
 - **데이터 형태**:  
   - **Source (condition)**: lighting map과 같은 single condition 
   - **Target (ground truth)**: 실제 치아와 유사한 렌더링 이미지  
@@ -27,7 +27,7 @@
 3. 해당 t에 대응하는 노이즈 비율 a_t를 이용해 노이즈를 추가  
 4. 이렇게 생성된 x_t가 학습 입력으로 사용됨  
 
-<img src="images/forward_noise_add_process.png" alt="forward process">  
+<img src="images/2_0_ctrlora/forward_noise_add_process.png" alt="forward process">  
 
 ---
 
@@ -77,7 +77,7 @@
 - 타깃은 forward에서 사용한 가우시안 노이즈 `ε`
 - 출력은 UNet의 예측 노이즈 `ε_hat`
 - loss:
-<img src="images/MSE.png" alt="MSE loss" width=600>  
+<img src="images/2_0_ctrlora/MSE.png" alt="MSE loss" width=600>  
 
 
 #### 4) backpropagation/update
@@ -93,19 +93,19 @@
 - ctrLoRA는 **Base ControlNet을 고정(frozen)** 후, LoRA만 추가학습함
 - Base ControlNet은 **9가지 condition (Canny, Depth, Normal, Segmentation, Pose 등**)을 하나의 네트워크에서 switching 가능하도록 학습됨. 즉, 조건별로 별도의 ControlNet을 두는 게 아니라, **하나의 base ControlNet을 공유**하면서 condition만 교체
 - Base ControlNet에 들어가는 condition은 VAE를 거쳐서 인코딩 한 후, controlNet과 같은 학습 과정을 거침
-<img src="images/base controlNet pipeline.png" alt="controlNet training process" width=600>
+<img src="images/2_1_ctrlora_training/base controlNet pipeline.png" alt="controlNet training process" width=600>
 
 ---
 
 ### (3) ctrLoRA의 LoRA 학습
 - ControlNet 전체를 학습하지 않고, base controlNet은 freeze한 뒤, **LoRA 모듈만 학습**  
 - **LoRA 구조**:  
-  <img src="images/lora.png" alt="lora" width=600>
+  <img src="images/2_0_ctrlora/lora.png" alt="lora" width=600>
   - W_0: 기존 weight (freeze)  
   - A, B: 저랭크 행렬 (trainable)  
   - a: scaling factor  
 - 학습 대상: LoRA 레이어 + ZeroConv + Normalization 레이어  
-<img src="images/lora_training_pipeline.png" alt="lora" width=200>
+<img src="images/2_1_ctrlora_training/lora_training_pipeline.png" alt="lora" width=200>
 
 ---
 
