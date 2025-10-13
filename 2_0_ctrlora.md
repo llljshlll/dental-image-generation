@@ -17,12 +17,13 @@
 
 ## 2 Principles
 ### 2.1 ControlNet 
-- **구조**: SD U-Net의 인코더/미들 블록을 **동결(locked)** 하고, **동일 구조의 학습 복제본(trainable copy)** 을 붙여 **zero-convolution(0으로 초기화된 1×1 conv)** 으로 합산. 초기 학습 안정성과 backbone 보호가 장점. 멀티 조건은 여러 ControlNet 출력을 더해 합성 가능. 
+- **구조**: SD U-Net의 encoder/middle block을 **locked** 하고, **trainable copy(동일 구조의 학습 가능본)** 를 붙여 **zero-convolution(0으로 초기화된 1×1 conv)** 으로 합산. 초기 학습 안정성과 backbone 보호가 장점. 멀티 조건은 여러 ControlNet 출력을 더해 합성 가능. 
 - **특성**: 조건 타입마다 **새 ControlNet**을 학습해야 함(데이터·연산 부담 큼).
+<img src="images/2_0_ctrlora/controlNet.png" alt="ControlNet" width=600>   
 
 ### 2.2 ControlLoRA
-- **아이디어**: **LoRA만**으로 조건 입력을 처리해 파라미터 수를 줄임.  
-- **한계(보고)**: 제한된 데이터에서 성능 저하 보고 (survey/관련연구 맥락).
+- **아이디어**: **LoRA만**으로 condition input을 처리해 파라미터 수를 줄임.  
+- **한계(보고)**: 제한된 데이터에서 성능 저하 보고.
 
 ### 2.3 **CtrLoRA**
 - **핵심 구조**:  
@@ -30,7 +31,8 @@
   - 각 조건에는 **LoRA 분기(조건별 LoRA)** 만 추가·학습(저자원).  
   - 새로운 조건은 **Base는 고정(frozen)**, **LoRA만 신규 학습**.
 - **조건 임베딩 설계**: 원 ControlNet의 랜덤 CNN 대신 **SD의 사전학습 VAE를 임베딩**으로 써 **수렴 가속**.
-- **멀티 조건 합성**: 해당 조건의 LoRA가 장착된 Base 출력을 **합산하여 조합** 가능(구조적으로 깔끔). 
+- **멀티 조건 합성**: 해당 조건의 LoRA가 장착된 Base 출력을 **합산하여 조합** 가능(구조적으로 깔끔).
+<img src="images/2_0_ctrlora/ctrLoRA_pipeline.png" alt="ctrLoRA" width=600>  
 
 ## 3 자원·비용 비교 (N개의 조건을 쓸 때)
 
@@ -88,7 +90,7 @@
 > 💡 “Random CNN → Pretrained VAE”  
 > 이미지를 임베딩할 때, 사전 학습된 VAE의 표현 공간을 그대로 활용하여  
 > 학습 효율을 극대화함.
-
+<img src="images/2_0_ctrlora/ctrLoRA_VAE.png" alt="ctrLoRA_VAE" width=600>  
 
 
 ### 5.2 Base ControlNet (Shared Backbone)
@@ -98,6 +100,7 @@
   **I2I(이미지-이미지) 생성의 일반 지식(common knowledge)** 을 획득한다.  
 - 각 condition별 LoRA가 추가되어, Base ControlNet은  
   “공통적 구조 학습”에 집중하고, LoRA는 “조건별 특수성 학습”에 집중한다.
+<img src="images/2_0_ctrlora/base_controlNet_pipeline.png" alt="base_controlNet_pipeline" width=600>  
 
 > 💡 Base ControlNet = General I2I Knowledge Learner  
 > LoRA = Condition Expert Module
@@ -110,6 +113,7 @@
 - 새로운 조건 추가 시, Base ControlNet은 고정하고 LoRA만 학습한다.  
 - 약 **1,000개 이미지 / 1시간 미만 / 단일 GPU (RTX 4090)** 으로도 학습 가능.  
 - LoRA Rank = 128로 설정 시 약 **37M 파라미터**만 업데이트됨.
+<img src="images/2_0_ctrlora/LoRA_pipeline.png" alt="LoRA_pipeline" width=600>  
 
 > 💡 “Train Once, Adapt Many”  
 > ControlNet 전체를 다시 학습하지 않고, LoRA를 추가하는 것만으로  
@@ -154,7 +158,7 @@ VAE Decoder → 제어된 이미지 복원
 
 ### 6.1 Base ControlNet (Shared Backbone)
 
-Base ControlNet은 **여러 조건(Condition)**을 하나의 네트워크로 통합 학습하기 위해 설계된  
+Base ControlNet은 **여러 Condition**을 하나의 네트워크로 통합 학습하기 위해 설계된  
 **공유형 I2I(Image-to-Image) 생성 모듈**이다.
 
 #### 6.1.1 구조 개요
