@@ -100,14 +100,41 @@
 ### 3.3 치아 weighting loss 조정
 
 배경  
-- **CASDM**의 **class-aware ε-MSE** 아이디어 차용, **작은/중요 클래스에 가중치 부여**로 복원 우선순위 재조정
-  
-- **치아 영역**에만 **손실 가중치↑**  
-  \[
-  \mathcal{L}=\Big(1+(w_{\text{tooth}}-1)\cdot M_{\text{tooth}}\Big)\cdot
-  \|\epsilon_\theta(x_t,t,c)-\epsilon\|_2^2,\quad w_{\text{tooth}}\in\{3,5,7\}
-  \]
-- **결론**: \(w_{\text{tooth}}=5\)가 **가장 우수**.  
+- **CASDM**의 **class-aware ε-MSE** 아이디어 차용
+  - CASDM의 class-aware ε-MSE : **작은/중요 클래스에 가중치 부여**로 복원 우선순위 재조정
+
+핵심 개념  
+- segmentation map 이용하여 **치아 픽셀 가중↑**, **잇몸·배경 픽셀 기본 가중**  
+- 결과적으로 학습이 **치아 경계·질감**에 더 많이 집중  
+
+구현 흐름 
+1) **weight map 생성(512*512)** 
+<img src="images/2_2_multi_condition/weight_map.png" width="300"/>
+- M_teeth(i, j) : 픽셀 (i, j)의 **치아 마스크 값**  
+- M_gum(i, j) : 픽셀((i, j)의 **잇몸 마스크 값**    
+- (w_teeth - 1.0), (w_gum - 1.0) : 각 영역의 **추가 가중치**
+- segmentation map 이용하여 치아 픽셀에 가중치 부여
+
+2) **latent space 크기 맞춤(64×64)**  
+   - diffusion 모델의 ε 예측은 **latent 공간**에서 이뤄짐  
+   - weight map을 bilinear interpolation으로 64×64로 축소  
+   - 이유: loss를 계산하는 해상도와 **weight 해상도 정렬** 필요  
+
+3) **Channel broadcast (4ch)**  
+   - ε prediction tensor 보통 **4 channels (latent ch=4)**  
+   - weight map을 channel 차원으로 **repeat**해 모든 채널에 동일 가중 적용  
+   - 이유: 채널마다 loss가 따로 계산 → **차원 호환** 필요
+     
+4) **Normalization (mean=1)**  
+   - weight map의 평균을 1로 정규화  
+   - 이유: 전체 loss scale 급변 방지, **training stability** 확보  
+
+5) **Loss application**  
+   - per-pixel ε-MSE에 weight map을 **element-wise multiply**  
+   - *tooth 영역 오차에 더 큰 페널티* 
+
+
+- **결론**: w_tooth=5가 **가장 우수**.  
   - **w=2**: 개선은 있으나 경계 선명도/질감 복원이 **부족**  
   - **w=5**: **경계·질감·안정성**의 **균형 최적**  
   - **w=8**: 경계 과증폭으로 **halo/ringing** 경향, 색 번짐 증가
