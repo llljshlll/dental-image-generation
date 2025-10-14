@@ -69,6 +69,13 @@
   ```
   F_unet^(l) <- F_unet^(l) + ZeroConv( F_control^(l) )
   ```
+  | 기호 | 의미 |
+  |------|------|
+  | **F_unet^(l)** | UNet의 l번째 layer에서의 feature map (원래 Stable Diffusion의 feature) |
+  | **F_control^(l)** | ControlNet의 동일 계층에서 계산된 feature map (condition branch 출력) |
+  | **ZeroConv(·)** | “Zero Convolution” — ControlNet 논문에서 도입한 핵심 구조 |
+  | **+ (더하기)** | 두 feature를 element-wise로 더해줌 (skip connection처럼) |
+
 - UNet의 down → middle → up 경로를 통과하며 최종 **예측 노이즈**를 출력:
 
 <img src="images/2_1_ctrLoRA_training/controlNet_training_process.png" alt="controlNet training process" width=600>  
