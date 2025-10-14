@@ -83,10 +83,11 @@
 - 관찰: 
   - **경계 품질 향상**: 치아–잇몸 경계 **안정**  
   - **디테일 복원 양호**: lighting 신호 반영 **유지**, 디테일 **소폭 개선**
-| input | LoRA에 1.0, 1.0 가중합 | **blending해서 단일 컨디션으로 학습**  | reference |
-|---|---|---|---|
-| ![seg_101](images/2_1_ctrLoRA_training/test/merge_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) | ![out_101](images/2_1_ctrLoRA_training/test/merge.png) |![out_101](images/2_1_ctrLoRA_training/test/lower_patient2_bottomm.png) |
-| ![seg_102](images/2_1_ctrLoRA_training/test/merge_upper_baliwish_right.png) | ![light_102](images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png) | ![out_102](images/2_1_ctrLoRA_training/test/1_interference_merge_cfg_2.png) | ![out_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right.png) |
+| input | LoRA에 1.0, 1.0 가중합 | **blending해서 단일 컨디션으로 학습** | reference |
+|:---:|:---:|:---:|:---:|
+| ![seg_101](images/2_1_ctrLoRA_training/test/merge_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) | ![out_101](images/2_1_ctrLoRA_training/test/merge.png) | ![ref_101](images/2_1_ctrLoRA_training/test/lower_patient2_bottomm.png) |
+| ![seg_102](images/2_1_ctrLoRA_training/test/merge_upper_baliwish_right.png) | ![light_102](images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png) | ![out_102](images/2_1_ctrLoRA_training/test/1_interference_merge_cfg_2.png) | ![ref_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right.png) |
+
 
 
 ---
