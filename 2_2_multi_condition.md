@@ -120,7 +120,7 @@
 
 | input | weight 2 | **weight 5** | reference |
 |:---:|:---:|:---:|:---:|
-| ![seg_101](images/2_1_ctrLoRA_training/test/merge_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/weight2_M357DNS7_left.png) | ![out_101](images/2_1_ctrLoRA_training/test/weight5_M357DNS7_left.png) | ![ref_101](images/2_1_ctrLoRA_training/test/lower_patient2_bottomm.png) |
+| ![seg_101](images/2_1_ctrLoRA_training/test/merge_upper_M357DNS7_left.png) | ![light_101](images/2_1_ctrLoRA_training/test/weight2_M357DNS7_left.png) | ![out_101](images/2_1_ctrLoRA_training/test/weight5_M357DNS7_left.png) | ![ref_101](images/2_1_ctrLoRA_training/test/upper_M357DNS7_left.png) |
 | ![seg_102](images/2_1_ctrLoRA_training/test/merge_upper_baliwish_right.png) | ![light_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right_1.png) | ![out_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right_5.png) | ![ref_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right.png) |
 
 
