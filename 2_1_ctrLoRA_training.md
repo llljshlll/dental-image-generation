@@ -99,7 +99,7 @@
 - ctrLoRA는 **Base ControlNet을 고정(frozen)** 후, LoRA만 추가학습함
 - Base ControlNet은 **9가지 condition (Canny, Depth, Normal, Segmentation, Pose 등**)을 하나의 네트워크에서 switching 가능하도록 학습됨. 즉, 조건별로 별도의 ControlNet을 두는 게 아니라, **하나의 base ControlNet을 공유**하면서 condition만 교체
 - Base ControlNet에 들어가는 condition은 VAE를 거쳐서 인코딩 한 후, controlNet과 같은 학습 과정을 거침
-<img src="images/2_1_ctrLoRA_training/base controlNet pipeline.png" alt="controlNet training process" width=600>
+<img src="images/2_1_ctrLoRA_training/base_controlNet_pipeline.png" alt="controlNet training process" width=600>
 
 ---
 
