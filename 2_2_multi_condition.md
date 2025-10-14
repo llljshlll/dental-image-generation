@@ -87,10 +87,10 @@
   - **디테일 복원 양호**: lighting 신호 반영 **유지**, 디테일 **소폭 개선**
  
 
-| input | LoRA에 1.0, 1.0 가중합 | **blending해서 단일 컨디션으로 학습** | reference |
+| Input | LoRA에 1.0, 1.0 가중합 | **Blending해서 단일 컨디션으로 학습** | Reference |
 |:---:|:---:|:---:|:---:|
-| ![seg_101](images/2_1_ctrLoRA_training/test/merge_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) | ![out_101](images/2_1_ctrLoRA_training/test/merge.png) | ![ref_101](images/2_1_ctrLoRA_training/test/lower_patient2_bottomm.png) |
-| ![seg_102](images/2_1_ctrLoRA_training/test/merge_upper_baliwish_right.png) | ![light_102](images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png) | ![out_102](images/2_1_ctrLoRA_training/test/1_interference_merge_cfg_2.png) | ![ref_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right.png) |
+| <img src="images/2_1_ctrLoRA_training/test/merge_lower_patient2_bottom.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/merge.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/lower_patient2_bottomm.png" width="160"/> |
+| <img src="images/2_1_ctrLoRA_training/test/merge_upper_baliwish_right.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/1_interference_merge_cfg_2.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/upper_baliwish_right.png" width="160"/> |
 
 
 
@@ -112,17 +112,18 @@
   - **w=5**: **경계·질감·안정성**의 **균형 최적**  
   - **w=8**: 경계 과증폭으로 **halo/ringing** 경향, 색 번짐 증가
 
-| input | blending해서 단일 컨디션으로 학습(weight 1) | weight 2 | **weight 5** | weight 8 | reference |
+| Input | Blending해서 단일 컨디션으로 학습 (weight=1) | weight=2 | **weight=5** | weight=8 | Reference |
 |:---:|:---:|:---:|:---:|:---:|:---:|
-| ![seg_101](images/2_1_ctrLoRA_training/test/merge_upper_M4HYU284_front.png) | ![light_101](images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_1.png) | ![out_101](images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_2.png) | ![ref_101](images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_5.png) | ![ref_101](images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_8.png) |
-![ref_101](images/2_1_ctrLoRA_training/test/upper_M4HYU284_front.png) |
+| <img src="images/2_1_ctrLoRA_training/test/merge_upper_M4HYU284_front.png" width="150"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_1.png" width="150"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_2.png" width="150"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_5.png" width="150"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_8.png" width="150"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M4HYU284_front.png" width="150"/> |
 
 
 
-| input | weight 2 | **weight 5** | reference |
+
+| Input | Weight=2 | **Weight=5** | Reference |
 |:---:|:---:|:---:|:---:|
-| ![seg_101](images/2_1_ctrLoRA_training/test/merge_upper_M357DNS7_left.png) | ![light_101](images/2_1_ctrLoRA_training/test/weight2_M357DNS7_left.png) | ![out_101](images/2_1_ctrLoRA_training/test/weight5_M357DNS7_left.png) | ![ref_101](images/2_1_ctrLoRA_training/test/upper_M357DNS7_left.png) |
-| ![seg_102](images/2_1_ctrLoRA_training/test/merge_upper_baliwish_right.png) | ![light_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right_1.png) | ![out_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right_5.png) | ![ref_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right.png) |
+| <img src="images/2_1_ctrLoRA_training/test/merge_upper_M357DNS7_left.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/weight2_M357DNS7_left.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/weight5_M357DNS7_left.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M357DNS7_left.png" width="160"/> |
+| <img src="images/2_1_ctrLoRA_training/test/merge_upper_baliwish_right.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/upper_baliwish_right_1.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/upper_baliwish_right_5.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/upper_baliwish_right.png" width="160"/> |
+
 
 
 
