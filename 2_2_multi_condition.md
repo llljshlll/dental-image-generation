@@ -13,7 +13,7 @@
   - **Lighting**    : 치아 표면 **굴곡/명암**을 안정적으로 반영  
 - **초기 조합 방식**: inference 시 **LoRA 가중합**  
 <img src="images/2_2_multi_condition/multi.png" alt="dataset" width=600>   
-  - 기본값: <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="dataset" width=600>  
+  - 기본값: <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="dataset" width=100>  
 
 ### 결과 (w_seg=1.0, w_light=1.0, steps=20, DDIM, CFG_light=2.0, CFG_seg=2.0, 512x512)
 
