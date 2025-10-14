@@ -75,7 +75,7 @@
 - **단일 condition**으로 묶어 **역할 분리 유지 + interference 완화** 목표
 
 - 학습 시 **segmentation 투명도 30%**로 **lighting에 합성**해서 input으로 사용
-<img src="images/2_2_multi_condition/input_blending.png" width="300"/>
+<img src="images/2_2_multi_condition/input_blending.png" width="600"/>
 - 아이디어: **segmentation 투명도 30%**로 **lighting에 합성**, **단일 condition**으로 처리  
   - \(\tilde{c} = \alpha \cdot c_{\text{seg}} + (1-\alpha)\cdot c_{\text{light}},\; \alpha=0.3\)
 - 적용: **seg+light 합성 지도**를 입력으로 하고, **단일 LoRA** training, inference  
