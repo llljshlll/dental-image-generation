@@ -47,17 +47,14 @@
    - Light LoRA: 질감 특화, 경계 취약  
    - 동일 공간 합성 시 취약점 상호 침투
 
-2) **Non-orthogonal residuals**  
-   - \(L_{\psi_{\text{seg}}}\), \(L_{\psi_{\text{light}}}\) 동특성 공간 합산  
-   - 채널/주파수 대역 침범, 기여도 무작위화
 
-3) **Scale imbalance**  
-   - <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="defalut" width=300> 고정  
+2) **Scale imbalance**  
+   - <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="defalut" width=200> 고정  
    - 과지배/과소 반영 발생
 
 관찰 증상
 - **Lighting 디테일 소실** → 미세 텍스처 평탄화  
-- **경계 이상** → 선명도 저하 혹은 과도 선명화(oversharpen) 발생
+- **경계 이상** → 선명도 저하 혹은 oversharpen 발생
 - **Concept bleed** → 잇몸 톤/형상 치아 영역 침투
 
 결론
@@ -78,7 +75,7 @@
 - **단일 condition**으로 묶어 **역할 분리 유지 + interference 완화** 목표
 
 - 학습 시 **segmentation 투명도 30%**로 **lighting에 합성**해서 input으로 사용
-
+<img src="images/2_2_multi_condition/input_blending.png" width="300"/>
 - 아이디어: **segmentation 투명도 30%**로 **lighting에 합성**, **단일 condition**으로 처리  
   - \(\tilde{c} = \alpha \cdot c_{\text{seg}} + (1-\alpha)\cdot c_{\text{light}},\; \alpha=0.3\)
 - 적용: **seg+light 합성 지도**를 입력으로 하고, **단일 LoRA** training, inference  
