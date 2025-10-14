@@ -17,10 +17,11 @@
 
 ### 결과 (w_seg=1.0, w_light=1.0, steps=20, DDIM, CFG_light=2.0, CFG_seg=2.0, 512x512)
 
-| Segmentation (input) | Lighting (input) | Output (seg=1.0 + light=1.0) | reference |
-|---|---|---|---|
-| ![seg_101](images/2_1_ctrLoRA_training/test/seg_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/lighting_lower_patient2_bottom.png) | ![out_101](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) |![out_101](images/2_1_ctrLoRA_training/test/lower_patient2_bottomm.png) |
-| ![seg_102](images/2_1_ctrLoRA_training/test/1_condition_segementation.png) | ![light_102](images/2_1_ctrLoRA_training/test/1_condition_lighting.png) | ![out_102](images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png) | ![out_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right.png) |
+| Segmentation (input) | Lighting (input) | Output (seg=1.0 + light=1.0) | Reference |
+|:---:|:---:|:---:|:---:|
+| <img src="images/2_1_ctrLoRA_training/test/seg_lower_patient2_bottom.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/lighting_lower_patient2_bottom.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/lower_patient2_bottomm.png" width="160"/> |
+| <img src="images/2_1_ctrLoRA_training/test/1_condition_segementation.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/1_condition_lighting.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png" width="160"/> | <img src="images/2_1_ctrLoRA_training/test/upper_baliwish_right.png" width="160"/> |
+
 
 
 
