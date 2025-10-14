@@ -36,6 +36,7 @@
 단순 가중합 적용(기본  <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="defalut" width=250>)
 <img src="images/2_2_multi_condition/multi.png" alt="lora weighting" width=600> 
 
+
 문제 핵심
 - 역할 혼선 → 각 조건의 약점 전파
 - 디테일 신호와 경계 신호의 비직교 합성 → 간섭 증폭
@@ -76,8 +77,9 @@
 
 - 학습 시 **segmentation 투명도 30%**로 **lighting에 합성**해서 input으로 사용
 <img src="images/2_2_multi_condition/input_blending.png" width="600"/>
+
+
 - 아이디어: **segmentation 투명도 30%**로 **lighting에 합성**, **단일 condition**으로 처리  
-  - \(\tilde{c} = \alpha \cdot c_{\text{seg}} + (1-\alpha)\cdot c_{\text{light}},\; \alpha=0.3\)
 - 적용: **seg+light 합성 지도**를 입력으로 하고, **단일 LoRA** training, inference  
 - 관찰: 
   - **경계 품질 향상**: 치아–잇몸 경계 **안정**  
