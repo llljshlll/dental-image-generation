@@ -116,26 +116,36 @@
 ---
 
 ## 4. Loss 계산
-- **출력**: UNet 최종 출력 = 예측 노이즈
-- loss :
-<img src="images/2_1_ctrLoRA_training/MSE.png" alt="MSE loss" width=600> 
-- **backpropagation 경로**:  
-  - MSE Loss가 Base UNet + ControlNet Branch 전체로 전파됨  
-  - 그러나 ctrLoRA에서는 Base ControlNet은 고정되어 있고, **LoRA 파라미터만 업데이트**  
 
-- **Optimizer/스케줄** 
+- **출력:** UNet 최종 출력 = 예측 노이즈  
+- **Loss:**  
+  <p align="center">
+    <img src="images/2_1_ctrLoRA_training/MSE.png" alt="MSE loss" width="600">
+  </p>
+
+- **Backpropagation 경로:**  
+  - MSE Loss가 Base UNet + ControlNet Branch 전체로 전파됨  
+  - ctrLoRA에서는 Base ControlNet은 고정되어 있고 **LoRA 파라미터만 업데이트**
+
+---
+
+### Optimizer / 스케줄
+
 | 항목 | 값 |
-|---|---|
-| Optimizer | AdamW (β1=0.9, β2=0.999, wd=0.01) |
-| LR | 1e-4 (warmup 2k, cosine decay) |
+|:---|:---|
+| Optimizer | AdamW (β₁=0.9, β₂=0.999, wd=0.01) |
+| Learning Rate | 1e-4 (warmup 2k, cosine decay) |
 | Batch | 8 (grad-accum=2 → 효과 16) |
 | Steps | 5k (val every 1k) |
 | Precision | fp16 (auto loss-scaling) |
 | Grad Clip | 1.0 |
 
-- **LoRA 설정**  
+---
+
+### LoRA 설정
+
 | 항목 | 값 |
-|---|---|
+|:---|:---|
 | Attach | ControlNet **down/mid/up** 핵심 Conv/Linear |
 | Rank r | 128 |
 | Alpha | 128 |
