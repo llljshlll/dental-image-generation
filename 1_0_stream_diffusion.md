@@ -46,7 +46,7 @@ Stream Diffusion은 **다층 최적화 파이프라인**이다:
 ---
 
 ### 2.2 Residual Classifier-Free Guidance (R-CFG)
-> **핵심 개념:** 음(negative) 조건의 중복 계산 제거로 속도 향상
+> **핵심 개념:** negative 조건의 중복 계산 제거로 속도 향상
 
 - 기존 CFG: 각 step마다 `ε_c`(조건), `ε_uc`(비조건)을 모두 계산  
 - R-CFG: 음조건 `ε_uc`를 **잔차(residual)** 로 근사 → 한 번(또는 0회)만 계산
