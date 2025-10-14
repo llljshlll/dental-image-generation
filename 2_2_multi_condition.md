@@ -21,12 +21,9 @@
 
 | Segmentation (input) | Lighting (input) | Output (seg=1.0 + light=1.0) |
 |---|---|---|
-| ![seg_101](images/2_1_ctrLoRA_training/test/seg_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/lighting_lower_patient2_bottom.png) | ![out_101](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) |
-| ![seg_102](images/2_1_ctrLoRA_training/test/1_condition_segementation.png) | ![light_102](images/2_1_ctrLoRA_training/test/1_condition_lighting.png) | ![out_102](images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png) |
-| ![seg_103](images/2_1_ctrLoRA_training/test/case103_seg.png) | ![light_103](images/2_1_ctrLoRA_training/test/case103_light.png) | ![out_103](images/2_1_ctrLoRA_training/test/case103_out_wseg1_wlight1.png) |
+| ![seg_101](images/2_1_ctrLoRA_training/test/1_condition_segementation.png) | ![light_101](images/2_1_ctrLoRA_training/test/1_condition_lighting.png) | ![out_101](images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1 .png) |
+| ![seg_102](images/2_1_ctrLoRA_training/test/seg_lower_patient2_bottom.png) | ![light_102](images/2_1_ctrLoRA_training/test/lighting_lower_patient2_bottom.png) | ![out_102](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) |
 
-
-<sub>규칙: `case{idx}_{seg|light|out_wseg1_wlight1}.png` · seed=42(연속 3케이스)</sub>
 
 
 
