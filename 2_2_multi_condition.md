@@ -19,7 +19,7 @@
 
 | Segmentation (input) | Lighting (input) | Output (seg=1.0 + light=1.0) | reference |
 |---|---|---|---|
-| ![seg_101](images/2_1_ctrLoRA_training/test/seg_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/lighting_lower_patient2_bottom.png) | ![out_101](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) |![out_101](images/2_1_ctrLoRA_training/test/lower_patient2_bottom.png) |
+| ![seg_101](images/2_1_ctrLoRA_training/test/seg_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/lighting_lower_patient2_bottom.png) | ![out_101](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) |![out_101](images/2_1_ctrLoRA_training/test/lower_patient2_bottomm.png) |
 | ![seg_102](images/2_1_ctrLoRA_training/test/1_condition_segementation.png) | ![light_102](images/2_1_ctrLoRA_training/test/1_condition_lighting.png) | ![out_102](images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png) | ![out_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right.png) |
 
 
