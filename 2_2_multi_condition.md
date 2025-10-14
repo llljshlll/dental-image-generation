@@ -112,7 +112,7 @@
   - **w=5**: **경계·질감·안정성**의 **균형 최적**  
   - **w=8**: 경계 과증폭으로 **halo/ringing** 경향, 색 번짐 증가
 
-| Input | Blending해서 단일 컨디션으로 학습 (weight=1) | weight=2 | **weight=5** | weight=8 | Reference |
+| Input | weight=1 | weight=2 | **weight=5** | weight=8 | Reference |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | <img src="images/2_1_ctrLoRA_training/test/merge_upper_M4HYU284_front.png" width="150"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_1.png" width="150"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_2.png" width="150"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_5.png" width="150"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M4HYU284_front_weight_8.png" width="150"/> | <img src="images/2_1_ctrLoRA_training/test/upper_M4HYU284_front.png" width="150"/> |
 
