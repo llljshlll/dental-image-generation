@@ -12,10 +12,8 @@
   - **Segmentation**: 치아/잇몸 **영역·경계**를 명확히 지정  
   - **Lighting**    : 치아 표면 **굴곡/명암**을 안정적으로 반영  
 - **초기 조합 방식**: inference 시 **LoRA 가중합**  
-  \[
-  C_{\theta,\Psi}(z,c) = C_\theta(z) \;+\; w_{\text{seg}} L_{\psi_{\text{seg}}}(z, c_{\text{seg}}) \;+\; w_{\text{light}} L_{\psi_{\text{light}}}(z, c_{\text{light}})
-  \]
-  - 기본값: \(w_{\text{seg}}=1.0,\; w_{\text{light}}=1.0\)
+<img src="images/2_2_multi_condition/multi.png" alt="dataset" width=600>   
+  - 기본값: <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="dataset" width=600>  
 
 ### 결과 (w_seg=1.0, w_light=1.0, steps=20, DDIM, CFG_light=2.0, CFG_seg=2.0, 512x512)
 
@@ -32,15 +30,40 @@
 
 ## 2) 문제: Multi-Condition Interference
 
-**증상** (seg + lighting 동시 적용 시)
-- **Ghosting / Duplication**: 경계 이중 윤곽  
-- **Concept Bleed**: 잇몸 색/형태가 치아로 스며듦(bleed-in)  
-- **Over-smoothing**: 질감 flattening
+역할 정의
+- **Lighting map** → 디테일·질감 복원
+- **Segmentation map** → 치아–잇몸 경계 보존·형상 유지
 
-**가설**
-1. **Feature Competition**: 동일 공간에서 LoRA 잔차가 경쟁  
-2. **Gradient Interference**: 공동 스텝에서 상반 그래디언트 누적  
-3. **Scale Imbalance**: 조건 임베딩 스케일/분포 불일치로 한 조건 과지배
+단순 가중합 적용(기본  <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="dataset">)
+<img src="images/2_2_multi_condition/multi.png" alt="dataset" width=600> 
+
+문제 핵심
+- 역할 혼선 → 각 조건의 약점 전파
+- 디테일 신호와 경계 신호의 비직교 합성 → 간섭 증폭
+- 임베딩 스케일 불균형 + 동등 가중 → 특정 조건 과지배 혹은 과소 반영
+
+원인 분석
+1) **역할 불일치(Role misalignment)**  
+   - Seg LoRA: 경계 특화, 질감 취약  
+   - Light LoRA: 질감 특화, 경계 취약  
+   - 동일 공간 합성 시 취약점 상호 침투
+
+2) **비직교 잔차 결합(Non-orthogonal residuals)**  
+   - \(L_{\psi_{\text{seg}}}\), \(L_{\psi_{\text{light}}}\) 동특성 공간 합산  
+   - 채널/주파수 대역 침범, 기여도 무작위화
+
+3) **스케일 불균형(Scale imbalance)**  
+   - 임베딩 분포 불일치 + \(w_{\text{seg}}=w_{\text{light}}=1.0\) 고정  
+   - 과지배/과소 반영 발생
+
+관찰 증상
+- **Lighting 디테일 소실** → 미세 텍스처 평탄화  
+- **경계 흐림·이중 윤곽** → 경계 선명도 저하  
+- **Concept bleed** → 잇몸 톤/형상 치아 영역 침투
+
+결론
+- 동등 가중 단순 합성 → 역할 분담 붕괴 → Multi-Condition Interference 발생  
+- 후속 완화 전략 필요: **LoRA gain 조정**, **입력 블렌딩(α)**, **치아 가중 손실(\(w_{\text{tooth}}\))**
 
 ---
 
