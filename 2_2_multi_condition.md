@@ -31,7 +31,7 @@
 - **Lighting map** → 디테일·질감 복원
 - **Segmentation map** → 치아–잇몸 경계 보존·형상 유지
 
-단순 가중합 적용(기본  <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="defalut" width=300>)
+단순 가중합 적용(기본  <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="defalut" width=250>)
 <img src="images/2_2_multi_condition/multi.png" alt="lora weighting" width=600> 
 
 문제 핵심
@@ -72,10 +72,22 @@
 ---
 
 ### 3.2 입력 블렌딩(α)
+- 서로 다른 브랜치 경로 → 충돌  
+- **단일 condition**으로 묶어 **역할 분리 유지 + interference 완화** 목표
+
+- 학습 시 **segmentation 투명도 30%**로 **lighting에 합성**해서 input으로 사용
+
 - 아이디어: **segmentation 투명도 30%**로 **lighting에 합성**, **단일 condition**으로 처리  
   - \(\tilde{c} = \alpha \cdot c_{\text{seg}} + (1-\alpha)\cdot c_{\text{light}},\; \alpha=0.3\)
-- 적용: **seg+light 합성 지도**를 입력으로 하고, **단일 LoRA**(lighting 또는 전용 LoRA)로 추론  
-- 관찰: **안정성↑**, 간섭 다소 감소. 단, **세부 제어력↓** (seg/lighting의 독립적 튜닝 어려움)
+- 적용: **seg+light 합성 지도**를 입력으로 하고, **단일 LoRA** training, inference  
+- 관찰: 
+  - **경계 품질 향상**: 치아–잇몸 경계 **안정**  
+  - **디테일 복원 양호**: lighting 신호 반영 **유지**, 디테일 **소폭 개선**
+| input | LoRA에 1.0, 1.0 가중합 | **blending해서 단일 컨디션으로 학습**  | reference |
+|---|---|---|---|
+| ![seg_101](images/2_1_ctrLoRA_training/test/merge_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) | ![out_101](images/2_1_ctrLoRA_training/test/merge.png) |![out_101](images/2_1_ctrLoRA_training/test/lower_patient2_bottomm.png) |
+| ![seg_102](images/2_1_ctrLoRA_training/test/merge_upper_baliwish_right.png) | ![light_102](images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png) | ![out_102](images/2_1_ctrLoRA_training/test/1_interference_merge_cfg_2.png) | ![out_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right.png) |
+
 
 ---
 
