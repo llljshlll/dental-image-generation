@@ -11,19 +11,16 @@
 - **다조건 목표**  
   - **Segmentation**: 치아/잇몸 **영역·경계**를 명확히 지정  
   - **Lighting**    : 치아 표면 **굴곡/명암**을 안정적으로 반영  
-- **초기 조합 방식**: inference 시 **LoRA 가중합**  
-<img src="images/2_2_multi_condition/multi.png" alt="dataset" width=600>   
-  - 기본값: <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="dataset" width=300>  
+- **초기 조합 방식**: inference 시 **LoRA weighting**  
+<img src="images/2_2_multi_condition/multi.png" alt="lora weighting" width=600>   
+  - 기본값: <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="defalut" width=300>  
 
 ### 결과 (w_seg=1.0, w_light=1.0, steps=20, DDIM, CFG_light=2.0, CFG_seg=2.0, 512x512)
 
-| Segmentation (input) | Lighting (input) | Output (seg=1.0 + light=1.0) |
-|---|---|---|
-| ![seg_101](images/2_1_ctrLoRA_training/test/seg_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/lighting_lower_patient2_bottom.png) | ![out_101](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) |
-| ![seg_102](images/2_1_ctrLoRA_training/test/1_condition_segementation.png) | ![light_102](images/2_1_ctrLoRA_training/test/1_condition_lighting.png) | ![out_102](images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png) |
-
-
-
+| Segmentation (input) | Lighting (input) | Output (seg=1.0 + light=1.0) | reference |
+|---|---|---|---|
+| ![seg_101](images/2_1_ctrLoRA_training/test/seg_lower_patient2_bottom.png) | ![light_101](images/2_1_ctrLoRA_training/test/lighting_lower_patient2_bottom.png) | ![out_101](images/2_1_ctrLoRA_training/test/multi_lower_patient2_bottom.png) |![out_101](images/2_1_ctrLoRA_training/test/lower_patient2_bottom.png) |
+| ![seg_102](images/2_1_ctrLoRA_training/test/1_condition_segementation.png) | ![light_102](images/2_1_ctrLoRA_training/test/1_condition_lighting.png) | ![out_102](images/2_1_ctrLoRA_training/test/1_interference_multi_lora_1_1.png) | ![out_102](images/2_1_ctrLoRA_training/test/upper_baliwish_right.png) |
 
 
 ---
@@ -34,8 +31,8 @@
 - **Lighting map** → 디테일·질감 복원
 - **Segmentation map** → 치아–잇몸 경계 보존·형상 유지
 
-단순 가중합 적용(기본  <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="dataset">)
-<img src="images/2_2_multi_condition/multi.png" alt="dataset" width=600> 
+단순 가중합 적용(기본  <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="defalut" width=300>)
+<img src="images/2_2_multi_condition/multi.png" alt="lora weighting" width=600> 
 
 문제 핵심
 - 역할 혼선 → 각 조건의 약점 전파
@@ -43,39 +40,38 @@
 - 임베딩 스케일 불균형 + 동등 가중 → 특정 조건 과지배 혹은 과소 반영
 
 원인 분석
-1) **역할 불일치(Role misalignment)**  
+1) **Role misalignment**  
    - Seg LoRA: 경계 특화, 질감 취약  
    - Light LoRA: 질감 특화, 경계 취약  
    - 동일 공간 합성 시 취약점 상호 침투
 
-2) **비직교 잔차 결합(Non-orthogonal residuals)**  
+2) **Non-orthogonal residuals**  
    - \(L_{\psi_{\text{seg}}}\), \(L_{\psi_{\text{light}}}\) 동특성 공간 합산  
    - 채널/주파수 대역 침범, 기여도 무작위화
 
-3) **스케일 불균형(Scale imbalance)**  
-   - 임베딩 분포 불일치 + \(w_{\text{seg}}=w_{\text{light}}=1.0\) 고정  
+3) **Scale imbalance**  
+   - <img src="images/2_2_multi_condition/seg=1,ligth=1.png" alt="defalut" width=300> 고정  
    - 과지배/과소 반영 발생
 
 관찰 증상
 - **Lighting 디테일 소실** → 미세 텍스처 평탄화  
-- **경계 흐림·이중 윤곽** → 경계 선명도 저하  
+- **경계 이상** → 선명도 저하 혹은 과도 선명화(oversharpen) 발생
 - **Concept bleed** → 잇몸 톤/형상 치아 영역 침투
 
 결론
 - 동등 가중 단순 합성 → 역할 분담 붕괴 → Multi-Condition Interference 발생  
-- 후속 완화 전략 필요: **LoRA gain 조정**, **입력 블렌딩(α)**, **치아 가중 손실(\(w_{\text{tooth}}\))**
+- 후속 완화 조치: **LoRA weight 조정**, **입력 블렌딩(α)**, **치아 weight loss 조정**
 
 ---
 
 ## 3) 완화 실험
 
-### A. **Naïve Multi-LoRA (baseline)**
-- 방법: `LoRA_seg` + `LoRA_light` **동시 활성화**(가중합)  
-- 결과: 위 **간섭 증상** 뚜렷
+### 3.1 LoRA weight 조정
+목표: 역할 분담 회복 (seg=경계, light=질감)
 
 ---
 
-### B. **Pre-Blending (입력 합성)**
+### 3.2 입력 블렌딩(α)
 - 아이디어: **segmentation 투명도 30%**로 **lighting에 합성**, **단일 condition**으로 처리  
   - \(\tilde{c} = \alpha \cdot c_{\text{seg}} + (1-\alpha)\cdot c_{\text{light}},\; \alpha=0.3\)
 - 적용: **seg+light 합성 지도**를 입력으로 하고, **단일 LoRA**(lighting 또는 전용 LoRA)로 추론  
@@ -83,7 +79,7 @@
 
 ---
 
-### C. **Segmentation-Weighted Loss (학습 시 가중) – w ∈ {3, 5, 7}**
+### 3.3 치아 weighting loss 조정
 - 아이디어: **치아 영역**에만 **손실 가중치↑**  
   \[
   \mathcal{L}=\Big(1+(w_{\text{tooth}}-1)\cdot M_{\text{tooth}}\Big)\cdot
