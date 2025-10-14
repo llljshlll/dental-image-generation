@@ -21,7 +21,7 @@
 
 ---
 
-## 2. Forward Process (노이즈 추가 과정)
+## 2. Forward Process
 1. 원본 이미지 x_0를 VAE 인코더를 통해 **latent space**로 변환  
 2. 랜덤 타임스텝 t를 샘플링 (ex. 327/1000)  
 3. 해당 t에 대응하는 노이즈 비율 a_t를 이용해 노이즈를 추가  
@@ -74,7 +74,7 @@
   | **F_unet^(l)** | UNet의 l번째 layer에서의 feature map (원래 Stable Diffusion의 feature) |
   | **F_control^(l)** | ControlNet의 동일 계층에서 계산된 feature map (condition branch 출력) |
   | **ZeroConv(·)** | “Zero Convolution” — ControlNet 논문에서 도입한 핵심 구조 |
-  | **+ (더하기)** | 두 feature를 element-wise로 더해줌 (skip connection처럼) |
+  | **+** | 두 feature를 element-wise로 더해줌 (skip connection처럼) |
 
 - UNet의 down → middle → up 경로를 통과하며 최종 **예측 노이즈**를 출력:
 
@@ -91,7 +91,6 @@
 - `L`을 기준으로 **gradient가 Base UNet과 ControlNet Branch 전체**로 전파
 - 구현 설정에 따라:
 - **표준 ControlNet 학습**: Base UNet을 **freeze**하고, **ControlNet Branch(+ZeroConv)**만 업데이트  
-- **공동 미세조정(옵션)**: Base UNet도 작은 lr로 함께 업데이트 가능
 - 결과적으로 ControlNet은 **c_cond → UNet에 유용한 residual**을 만드는 법을 학습
 
 ---
