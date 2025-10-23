@@ -18,7 +18,7 @@ MV-Adapter는 기존 **Stable Diffusion (SD2.1 / SDXL)** 구조를 변경하지 
 **multi-view consistency**를 학습하기 위한 모듈(adapter)만 추가하는 방식으로 동작함 
 <img src="images/multi_condition/insert.png" alt="Decoupled Attention Layers" width=600> 
 
-핵심은 다음 두 가지 구성 요소로 이루어진다.
+핵심은 다음 두 가지 구성 요소로 이뤄짐
 
 1. **Condition Guider** – 카메라/지오메트리 조건을 인코딩하여 UNet 내부에 주입  
 2. **Decoupled Attention Layers** – 기존 attention 구조를 병렬화(parallelization)하여  
@@ -29,9 +29,9 @@ MV-Adapter는 기존 **Stable Diffusion (SD2.1 / SDXL)** 구조를 변경하지 
 
 ### 2.1 Condition Guider
 
-Condition Guider는 각 시점(view)에 대한 **카메라 정보(Camera condition)** 또는  
-**지오메트리 정보(Geometry condition)**를 feature map으로 변환해  
-UNet의 여러 스케일(feature scale)에 주입하는 역할을 한다.
+Condition Guider는 각 시점(view)에 대한 **Camera condition** 또는  
+**Geometry condition**를 feature map으로 변환해  
+UNet의 여러 스케일(feature scale)에 주입하는 역할  
 
 #### 입력
 - **Camera ray map (Raymap)**  
@@ -46,7 +46,7 @@ UNet의 여러 스케일(feature scale)에 주입하는 역할을 한다.
 #### 역할
 - 입력 조건 (Camera ray map, Geometry condition)을  
   convolutional block을 통해 multi-scale feature로 변환  
-- 각 scale의 feature를 **UNet encoder의 대응되는 계층에 더함 (additive injection)**  
+- 각 scale의 feature를 **UNet encoder의 대응되는 계층에 더함 (additive injection**)  
 - 이로써 모델은 각 view의 공간적 배치(spatial configuration)와 표면 방향(surface orientation)을 인식  
 
 > 즉, Condition Guider는 **“geometry-aware feature conditioning layer”**로,  
@@ -57,7 +57,7 @@ UNet의 여러 스케일(feature scale)에 주입하는 역할을 한다.
 
 ### 2.2 Decoupled Attention Layers
 
-MV-Adapter의 핵심 혁신은 **기존 self-attention 구조를 “복제(duplicate)”하고 병렬화(parallelize)** 하는 것
+MV-Adapter의 핵심은 **기존 self-attention 구조를 duplicate하고 parallelize** 하는 것
 
 #### 구성 요소
 <img src="images/multi_condition/pipeline.png" alt="Decoupled Attention Layers" width=600> 
@@ -68,9 +68,9 @@ MV-Adapter의 핵심 혁신은 **기존 self-attention 구조를 “복제(dupli
 | **Multi-View Attention** | view 간(cross-view) 대응 픽셀 정보 교환 | 모든 view feature |
 | **Image Cross-Attention** | reference image의 세부 시각적 특성 유지 | frozen UNet feature (t=0) |
 | **Text Cross-Attention** | 텍스트 조건 반영 | CLIP text embedding |
-
+  
 Spatial Self-Attention, Text Cross-Attention은 기존 stable diffusion UNet의 기본 블록이며,  
-Multi-View Attention, Image Cross-Attention은 Spatial Self-Attention 블록을 복제한 구조의 블록임
+Multi-View Attention, Image Cross-Attention은 Spatial Self-Attention 블록을 복제한 구조의 블록  
 
 #### Parallel Architecture
 
@@ -80,11 +80,11 @@ MV-Adapter는 이를 **parallel residual structure**로 변경
 <img src="images/multi_condition/sd_layer.png" alt="Decoupled Attention Layers" width=600>
 
 
-- **입력 feature가 동일하게 공유**되므로,  
-  기존 pretrained weight의 priors를 그대로 활용 가능  
-- 새로운 attention layer의 **output projection을 0으로 초기화(zero-init)** →  
-  초기에 기존 모델의 feature space를 전혀 교란하지 않음  
-- Multi-view와 Image cross-attention이 학습되면서  
+- 기존 Stable Diffusion의 UNet에서 나온 latent feature를 모든 attention 블록(Self, Multi-view, Image Cross, Text Cross)이 동시에 공유하므로,  
+  기존 pretrained weight 그대로 활용 가능  
+- 학습시, 추가한 attention layer의 **output projection을 0으로 초기화(zero-init)** →  
+  controlNet 학습처럼 초기에 기존 모델의 feature space를 전혀 교란하지 않음  
+- Multi-view와 Image cross-attention이 각각 Multi-View Attention, Image Cross-Attention에서 학습되면서  
   점진적으로 geometry-aware consistency를 학습함
 
 > 이 병렬 구조는 pretrained prior를 유지하면서  
@@ -93,7 +93,7 @@ MV-Adapter는 이를 **parallel residual structure**로 변경
 
 ---
 
-### 2.3 Training Objective
+### 2.3 Training
 
 학습 시에는 **기존 Stable Diffusion과 동일한 noise prediction loss (ε-MSE)**를 사용하되,  
 MV-Adapter의 파라미터만 업데이트함
