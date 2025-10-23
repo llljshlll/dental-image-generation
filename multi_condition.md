@@ -8,8 +8,9 @@
 
 **MV-Adapter**는 **mesh → image 방향(top-down**) 접근을 취하며,  
 **reference image와 명시적인 3D geometry condition (position, normal, raymap**)을 함께 사용하여  
-multi-view 전반에서 **reference image의 시각적 일관성(visual consistency)**을 유지한다.  
-<img src="images/multi_condition/insert.png" alt="Decoupled Attention Layers" width=600> 
+multi-view 전반에서 **reference image의 시각적 일관성(visual consistency**)을 유지  
+
+---
 
 ## 2. Mechanism
 
@@ -22,6 +23,7 @@ MV-Adapter는 기존 **Stable Diffusion (SD2.1 / SDXL)** 구조를 변경하지 
 1. **Condition Guider** – 카메라/지오메트리 조건을 인코딩하여 UNet 내부에 주입  
 2. **Decoupled Attention Layers** – 기존 attention 구조를 병렬화(parallelization)하여  
    multi-view, image, text 정보를 동시에 처리
+
 
 ---
 
