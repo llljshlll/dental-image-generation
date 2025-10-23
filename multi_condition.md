@@ -9,6 +9,7 @@
 반면 **MV-Adapter**는 **mesh → image 방향(top-down)** 접근을 취하며,  
 **reference image와 명시적인 3D geometry condition (position, normal, raymap)**을 함께 사용하여  
 multi-view 전반에서 **reference image의 시각적 일관성(visual consistency)**을 유지한다.
+<img src="images/multi_condition/insert.png" alt="Decoupled Attention Layers" width=600> 
 
 ## 2. Mechanism
 
