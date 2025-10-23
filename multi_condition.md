@@ -35,11 +35,11 @@ UNet의 여러 스케일(feature scale)에 주입하는 역할
 
 #### 입력
 - **Camera ray map (Raymap)**  
-  - 각 픽셀의 광선 방향(ray direction)과 원점(ray origin)을 나타내는 6채널 맵  
+  - 각 픽셀의 ray direction과 ray origin을 나타내는 6채널 맵  
   - 카메라의 **intrinsic/extrinsic matrix**를 이용해 3D→2D로 투사 시 계산  
 - **Geometry condition (Position + Normal maps)**  
-  - mesh 표면에서 렌더링된 3D 좌표(Position)와 법선 벡터(Normal)  
-  - 픽셀 단위로 object surface의 공간적 대응관계(point correspondence) 제공
+  - mesh 표면에서 렌더링된 3D Position과 Normal  
+  - 픽셀 단위로 object surface의 공간적 대응관계 제공
 
 > 코드에서는 mesh에서 Camera ray map과 Geometry condition를 직접 뽑아냄
 
@@ -47,13 +47,13 @@ UNet의 여러 스케일(feature scale)에 주입하는 역할
 - 입력 조건 (Camera ray map, Geometry condition)을  
   convolutional block을 통해 multi-scale feature로 변환  
 - 각 scale의 feature를 **UNet encoder의 대응되는 계층에 더함 (additive injection**)  
-- 이로써 모델은 각 view의 공간적 배치(spatial configuration)와 표면 방향(surface orientation)을 인식  
+- 이로써 모델은 각 view의 공간적 배치와 표면 방향을 인식  
 
 - Condition Guider의 convolutional encoder는  
   입력 condition을 **U-Net encoder의 각 downsampling block 해상도에 맞춰**  
   multi-scale feature로 인코딩하고,  
-  이를 해당 scale의 feature에 **additive로 주입** 한다.  
-  이 과정을 통해 geometry 정보가 U-Net의 모든 인코딩 단계에 통합된다.  
+  이를 해당 scale의 feature에 **additive로 주입**.  
+  이 과정을 통해 geometry 정보가 U-Net의 모든 인코딩 단계에 통합됨.  
 
 > 즉, Condition Guider는 **“geometry-aware feature conditioning layer”**로,  
 > multi-view consistency를 위한 명시적 구조 정보를 UNet feature space에 통합함
