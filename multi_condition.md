@@ -102,7 +102,7 @@ MV-Adapter의 파라미터만 업데이트함
 
 ### 2.4 Inference Pipeline
 
-추론 시에는 다음 순서로 작동한다.
+추론 시에는 다음 순서로 작동  
 <img src="images/multi_condition/pipeline.png" alt="Decoupled Attention Layers" width=600>
 1. Text prompt, reference image, camera/geometry map 입력  
 2. Condition Guider가 각 condition을 feature map으로 변환  
