@@ -49,6 +49,12 @@ UNet의 여러 스케일(feature scale)에 주입하는 역할
 - 각 scale의 feature를 **UNet encoder의 대응되는 계층에 더함 (additive injection**)  
 - 이로써 모델은 각 view의 공간적 배치(spatial configuration)와 표면 방향(surface orientation)을 인식  
 
+- Condition Guider의 convolutional encoder는  
+  입력 condition을 **U-Net encoder의 각 downsampling block 해상도에 맞춰**  
+  multi-scale feature로 인코딩하고,  
+  이를 해당 scale의 feature에 **additive로 주입** 한다.  
+  이 과정을 통해 geometry 정보가 U-Net의 모든 인코딩 단계에 통합된다.  
+
 > 즉, Condition Guider는 **“geometry-aware feature conditioning layer”**로,  
 > multi-view consistency를 위한 명시적 구조 정보를 UNet feature space에 통합함
 
@@ -62,12 +68,13 @@ MV-Adapter의 핵심은 **기존 self-attention 구조를 duplicate하고 parall
 #### 구성 요소
 <img src="images/multi_condition/pipeline.png" alt="Decoupled Attention Layers" width=600> 
 
-| Attention Type | 역할 | 입력 |
-|----------------|------|------|
-| **Spatial Self-Attention** | view 내부(intra-view) 공간적 관계 학습 | 현재 view feature |
-| **Multi-View Attention** | view 간(cross-view) 대응 픽셀 정보 교환 | 모든 view feature |
-| **Image Cross-Attention** | reference image의 세부 시각적 특성 유지 | frozen UNet feature (t=0) |
-| **Text Cross-Attention** | 텍스트 조건 반영 | CLIP text embedding |
+| Type | Query | Key/Value | 목적 |
+|------|--------|------------|------|
+| Spatial Self-Attn | 현재 view latent | Text embedding | 현재 view feature |
+| Multi-view Attn | 현재 view latent | 다른 view latent | 3D 구조 일관성 |
+| Image Cross-Attn | 현재 view latent | Reference image latent | 시각적 스타일 일관성 |
+| Text Cross-Attn | (Self + Multi-View + Image Cross)의 합산 feature | CLIP text embedding | 의미 반영 |  
+
   
 Spatial Self-Attention, Text Cross-Attention은 기존 stable diffusion UNet의 기본 블록이며,  
 Multi-View Attention, Image Cross-Attention은 Spatial Self-Attention 블록을 복제한 구조의 블록  
@@ -95,7 +102,7 @@ MV-Adapter는 이를 **parallel residual structure**로 변경
 
 ### 2.3 Training
 
-학습 시에는 **기존 Stable Diffusion과 동일한 noise prediction loss (ε-MSE)**를 사용하되,  
+학습 시에는 **기존 Stable Diffusion과 동일한 noise prediction loss (ε-MSE**)를 사용하되,  
 MV-Adapter의 파라미터만 업데이트함
 
 ---
@@ -105,6 +112,9 @@ MV-Adapter의 파라미터만 업데이트함
 추론 시에는 다음 순서로 작동  
 <img src="images/multi_condition/pipeline.png" alt="Decoupled Attention Layers" width=600>
 1. Text prompt, reference image, camera/geometry map 입력  
+- image reference
+   - vae로 latent 생성
+   - time step을 0으로 설정(noise없는 상태)해서 기존 Unet에 넣음
 2. Condition Guider가 각 condition을 feature map으로 변환  
 3. Decoupled Attention Layers가 multi-view / image / text 정보를 병렬로 융합  
 4. 각 시점(view)에 대한 latent representation을 동시에 업데이트  
