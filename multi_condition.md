@@ -66,7 +66,8 @@ MV-Adapter의 핵심 혁신은 **기존 self-attention 구조를 “복제(dupli
 #### Parallel Architecture
 
 기존 Stable Diffusion의 attention은 **serial residual connection** 구조로 되어 있지만,  
-MV-Adapter는 이를 **parallel residual structure**로 변경
+MV-Adapter는 이를 **parallel residual structure**로 변경  
+
 <img src="images/multi_condition/sd_layer.png" alt="Decoupled Attention Layers" width=600>
 
 
