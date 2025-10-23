@@ -23,7 +23,7 @@ MV-Adapter는 기존 **Stable Diffusion (SD2.1 / SDXL)** 구조를 변경하지 
 1. **Condition Guider** – 카메라/지오메트리 조건을 인코딩하여 UNet 내부에 주입  
 2. **Decoupled Attention Layers** – 기존 attention 구조를 병렬화(parallelization)하여  
    multi-view, image, text 정보를 동시에 처리
-
+<img src="images/multi_condition/pipeline.png" alt="Decoupled Attention Layers" width=600> 
 
 ---
 
