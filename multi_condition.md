@@ -1,4 +1,6 @@
+# MV-Adapter: Multi-view Consistent Image Generation Made Easy
 
+---
 
 ## 1. Motivation
 기존 multi-view diffusion 모델들은 대부분 **입력 이미지로부터 3D geometry를 추론**하고,  
@@ -62,6 +64,9 @@ MV-Adapter의 핵심 혁신은 **기존 self-attention 구조를 “복제(dupli
 | **Multi-View Attention** | view 간(cross-view) 대응 픽셀 정보 교환 | 모든 view feature |
 | **Image Cross-Attention** | reference image의 세부 시각적 특성 유지 | frozen UNet feature (t=0) |
 | **Text Cross-Attention** | 텍스트 조건 반영 | CLIP text embedding |
+
+Spatial Self-Attention, Text Cross-Attention은 기존 stable diffusion UNet의 기본 블록이며,  
+Multi-View Attention, Image Cross-Attention은 Spatial Self-Attention 블록을 복제한 구조의 블록임
 
 #### Parallel Architecture
 
