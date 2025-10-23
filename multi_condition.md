@@ -4,17 +4,18 @@
 
 ## 1. Motivation
 기존 multi-view diffusion 모델들은 대부분 **입력 이미지로부터 3D geometry를 추론**하고,  
-그 결과로 multi-view 이미지를 생성하는 **bottom-up pipeline**을 사용한다.
+그 결과로 multi-view 이미지를 생성하는 **bottom-up pipeline**을 사용
 
-반면 **MV-Adapter**는 **mesh → image 방향(top-down)** 접근을 취하며,  
-**reference image와 명시적인 3D geometry condition (position, normal, raymap)**을 함께 사용하여  
-multi-view 전반에서 **reference image의 시각적 일관성(visual consistency)**을 유지한다.
+**MV-Adapter**는 **mesh → image 방향(top-down**) 접근을 취하며,  
+**reference image와 명시적인 3D geometry condition (position, normal, raymap**)을 함께 사용하여  
+multi-view 전반에서 **reference image의 시각적 일관성(visual consistency)**을 유지한다.  
 <img src="images/multi_condition/insert.png" alt="Decoupled Attention Layers" width=600> 
 
 ## 2. Mechanism
 
 MV-Adapter는 기존 **Stable Diffusion (SD2.1 / SDXL)** 구조를 변경하지 않고,  
 **multi-view consistency**를 학습하기 위한 모듈(adapter)만 추가하는 방식으로 동작함 
+<img src="images/multi_condition/insert.png" alt="Decoupled Attention Layers" width=600> 
 
 핵심은 다음 두 가지 구성 요소로 이루어진다.
 
