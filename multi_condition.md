@@ -133,3 +133,7 @@ pretraiened model에 대해 치아 도메인 실험
 | up (180°) | ![normal-back](images/mv/back/normal.png) | ![position-back](images/mv/back/position.png) | ![infer-back](images/mv/back/infer.png) |
 | down (270°) | ![normal-left](images/mv/left/normal.png) | ![position-left](images/mv/left/position.png) | ![infer-left](images/mv/left/infer.png) |
 | back (315°) | ![normal-fl](images/mv/front_left/normal.png) | ![position-fl](images/mv/front_left/position.png) | ![infer-fl](images/mv/front_left/infer.png) |
+
+open surface라서 상, 하, 후면의 inference가 이상하게 나옴
+=> mesh의 뒷면을 채움(./mesh_closed 링크)
+
