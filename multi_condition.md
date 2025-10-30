@@ -123,6 +123,13 @@ MV-Adapter의 파라미터만 업데이트함
 ---
 
 ## 3. inference
-pretraiened model에 대해
-제공된 example inferece  
+pretraiened model에 대해 치아 도메인 실험
 
+| View (Azimuth) | Normal | Position | Inference |
+|---|---|---|---|
+| Front (0°) | ![normal-front](images/mv/front/normal.png) | ![position-front](images/mv/front/position.png) | ![infer-front](images/mv/front/infer.png) |
+| Right (90°) | ![normal-fr](images/mv/front_right/normal.png) | ![position-fr](images/mv/front_right/position.png) | ![infer-fr](images/mv/front_right/infer.png) |
+| Left (270°) | ![normal-right](images/mv/right/normal.png) | ![position-right](images/mv/right/position.png) | ![infer-right](images/mv/right/infer.png) |
+| up (180°) | ![normal-back](images/mv/back/normal.png) | ![position-back](images/mv/back/position.png) | ![infer-back](images/mv/back/infer.png) |
+| down (270°) | ![normal-left](images/mv/left/normal.png) | ![position-left](images/mv/left/position.png) | ![infer-left](images/mv/left/infer.png) |
+| back (315°) | ![normal-fl](images/mv/front_left/normal.png) | ![position-fl](images/mv/front_left/position.png) | ![infer-fl](images/mv/front_left/infer.png) |
