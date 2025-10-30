@@ -123,4 +123,6 @@ MV-Adapter의 파라미터만 업데이트함
 ---
 
 ## 3. inference
+pretraiened model에 대해
+제공된 example inferece  
 
