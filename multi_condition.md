@@ -29,18 +29,19 @@ MV-Adapter는 기존 **Stable Diffusion (SD2.1 / SDXL)** 구조를 변경하지 
 
 ### 2.1 Condition Guider
 
-Condition Guider는 각 시점(view)에 대한 **Camera condition** 또는  
-**Geometry condition**를 feature map으로 변환해  
-UNet의 여러 스케일(feature scale)에 주입하는 역할  
+Condition Guider는 각 시점(view)에서 얻은 **Geometry 기반 조건(Condition Maps)** 을
+feature map으로 변환하여 UNet의 여러 스케일(feature scale)에 주입하는 모듈
+이를 통해 시점별 geometry 일관성을 유지하며 multi-view 이미지를 생성할 수 있음
 
 #### 입력
-- **Camera ray map (Raymap)**  
-  - 각 픽셀의 ray direction과 ray origin을 나타내는 6채널 맵  
-  - 카메라의 **intrinsic/extrinsic matrix**를 이용해 3D→2D로 투사 시 계산  
-- **Geometry condition (Position + Normal maps)**  
-  - mesh 표면에서 렌더링된 3D Position과 Normal  
-  - 픽셀 단위로 object surface의 공간적 대응관계 제공
-
+- **Camera ray map(Position maps)**
+  - mesh 표면을 world-space에서 렌더링해 얻은 3채널 맵
+  - 각 픽셀에 대응하는 **실제 3D 표면 좌표(X, Y, Z)**를 포함
+  - Stable Diffusion의 conditioning에서 geometry의 절대 위치 정보를 제공
+- **Geometry condition (Normal maps)**  
+  - mesh 표면에서 렌더링된 surface normal 맵
+  - 각 픽셀의 **표면 방향 벡터(nx, ny, nz)**를 제공해 미세 구조 표현에 도움을 줌
+    
 > 코드에서는 mesh에서 Camera ray map과 Geometry condition를 직접 뽑아냄
 
 #### 역할
