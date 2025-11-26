@@ -20,44 +20,47 @@ MV-Adapter는 기존 **Stable Diffusion (SD2.1 / SDXL)** 구조를 변경하지 
 
 핵심은 다음 두 가지 구성 요소로 이뤄짐
 
-1. **Condition Guider** – 카메라/지오메트리 조건을 인코딩하여 UNet 내부에 주입  
-2. **Decoupled Attention Layers** – 기존 attention 구조를 병렬화(parallelization)하여  
+1. **Condition Guider** – position/geometry condition을 인코딩하여 UNet 내부에 주입  
+2. **Decoupled Attention Layers** – 기존 attention 구조를 병렬화하여  
    multi-view, image, text 정보를 동시에 처리
 <img src="images/multi_condition/pipeline.png" alt="Decoupled Attention Layers" width=600> 
 
 ---
-
 ### 2.1 Condition Guider
 
-Condition Guider는 각 시점(view)에서 얻은 **Geometry 기반 조건(Condition Maps)** 을
-feature map으로 변환하여 UNet의 여러 스케일(feature scale)에 주입하는 모듈
-이를 통해 시점별 geometry 일관성을 유지하며 multi-view 이미지를 생성할 수 있음
+Condition Guider는 각 view에서 렌더링된 **Position Map + Normal Map**을  
+geometry-conditioned feature로 변환하고,  
+**U-Net Down Block 내부의 모든 ResNet Block 출력에 직접 더해주는 (Residual Add)** 모듈  
+각 view의 구조적 정보를 강하게 보존하면서 multi-view 이미지 생성을 지원해주는 역할을 함
+
+
 
 #### 입력
-- **Camera ray map(Position maps)**
-  - mesh 표면을 world-space에서 렌더링해 얻은 3채널 맵
-  - 각 픽셀에 대응하는 **실제 3D 표면 좌표(X, Y, Z)**를 포함
-  - Stable Diffusion의 conditioning에서 geometry의 절대 위치 정보를 제공
-- **Geometry condition (Normal maps)**  
-  - mesh 표면에서 렌더링된 surface normal 맵
-  - 각 픽셀의 **표면 방향 벡터(nx, ny, nz)**를 제공해 미세 구조 표현에 도움을 줌
-    
-> 코드에서는 mesh에서 Camera ray map과 Geometry condition를 직접 뽑아냄
+- **Position Map (3채널)**  
+  - mesh 표면의 world-space 좌표 (X, Y, Z)
+- **Normal Map (3채널)**  
+  - 표면 방향 벡터 (nx, ny, nz)
 
-#### 역할
-- 입력 조건 (Camera ray map, Geometry condition)을  
-  convolutional block을 통해 multi-scale feature로 변환  
-- 각 scale의 feature를 **UNet encoder의 대응되는 계층에 더함 (additive injection**)  
-- 이로써 모델은 각 view의 공간적 배치와 표면 방향을 인식  
+→ concat하여 **(6, H, W)**  
+→ 6 views에 대해 batch로 구성 → **(6, 6, H, W)**
 
-- Condition Guider의 convolutional encoder는  
-  입력 condition을 **U-Net encoder의 각 downsampling block 해상도에 맞춰**  
-  multi-scale feature로 인코딩하고,  
-  이를 해당 scale의 feature에 **additive로 주입**.  
-  이 과정을 통해 geometry 정보가 U-Net의 모든 인코딩 단계에 통합됨.  
+> 코드에서는 mesh 기반으로 Position + Normal을 직접 렌더링하여 사용함
 
-> 즉, Condition Guider는 **“geometry-aware feature conditioning layer”**로,  
-> multi-view consistency를 위한 명시적 구조 정보를 UNet feature space에 통합함
+
+
+#### 처리 방식 & 역할
+- concat된 geometry condition을  
+  **Conv → Norm → Activation**으로 feature 변환  
+- Down Block 내부 **모든 ResNet Block** 출력에 직접 Add (Residual Injection)
+'''
+Feature_out = Feature_out + ConditionFeature
+'''
+- U-Net backbone의 feature 흐름 전체에 geometry 정보를 지속적으로 통합  
+- View별 구조(grid alignment, pose consistency) 유지에 핵심적 역할
+
+> **Condition Guider = Geometry-aware residual injection layer**  
+> U-Net Downsample 영역 전체에 geometry 정보를 강하게 주입하여  
+> 각 view 내부의 구조적 일관성을 보장하는 핵심 모듈
 
 ---
 
