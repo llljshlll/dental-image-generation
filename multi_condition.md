@@ -33,7 +33,7 @@ geometry-conditioned feature로 변환하고,
 **U-Net Down Block 내부의 모든 ResNet Block 출력에 직접 더해주는 (Residual Add)** 모듈  
 각 view의 구조적 정보를 강하게 보존하면서 multi-view 이미지 생성을 지원해주는 역할을 함
 
-<img src="images/multi_condition/UNet.png" alt="Decoupled Attention Layers" width=600> 
+<img src="images/multi_condition/UNet.png" alt="Decoupled Attention Layers"> 
 
 #### 입력
 - **Position Map (3채널)**  
