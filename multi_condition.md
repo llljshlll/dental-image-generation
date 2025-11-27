@@ -51,10 +51,10 @@ geometry-conditioned feature로 변환하고,
 #### 처리 방식 & 역할
 - concat된 geometry condition을  
   **Conv → Norm → Activation**으로 feature 변환  
-- Down Block 내부 **모든 ResNet Block** 출력에 직접 Add (Residual Injection)
-'''
+- Down Block 내부 **모든 ResNet Block** 출력에 직접 Add (Residual Injection)   
+```
 Feature_out = Feature_out + ConditionFeature
-'''
+```
 - U-Net backbone의 feature 흐름 전체에 geometry 정보를 지속적으로 통합  
 - View별 구조(grid alignment, pose consistency) 유지에 핵심적 역할
 
@@ -82,6 +82,7 @@ MV-Adapter의 핵심은 **기존 self-attention 구조를 duplicate하고 parall
   
 Spatial Self-Attention, Text Cross-Attention은 기존 stable diffusion UNet의 기본 블록이며,  
 Multi-View Attention, Image Cross-Attention은 Spatial Self-Attention 블록을 복제한 구조의 블록  
+
 
 #### Parallel Architecture
 
